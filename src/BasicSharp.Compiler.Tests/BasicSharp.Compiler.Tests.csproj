@@ -66,6 +66,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SlidingText\MatchTest.cs" />
     <Compile Include="SlidingText\SlidingTextSources.cs" />
+    <Compile Include="SlidingText\PositionTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BasicSharp.Compiler\BasicSharp.Compiler.csproj">
