@@ -3,9 +3,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using BasicSharp.Compiler.Tests.SlidingText;
 using System.Linq;
 using FluentAssertions;
+using BasicSharp.Compiler.Lexer;
 
 using lxr = BasicSharp.Compiler.Lexer;
-using BasicSharp.Compiler.Lexer;
 
 namespace BasicSharp.Compiler.Tests.Lexer
 {
