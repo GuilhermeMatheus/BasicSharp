@@ -90,7 +90,7 @@ namespace BasicSharp.Compiler.Lexer
                 peekBuffer.Enqueue((char)peek);
             }
 
-            return peekBuffer.ElementAt(jumps);// charOrInvalidCharFrom(peek);
+            return peekBuffer.ElementAt(jumps);
         }
 
         public int JumpUntil(char c)

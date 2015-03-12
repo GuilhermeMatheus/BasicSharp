@@ -8,6 +8,7 @@ namespace BasicSharp.Compiler.Lexer
 {
     public enum SyntaxKind
     {
+        Namespace,
         Identifier,
 
         OpenBraceToken,
@@ -39,7 +40,6 @@ namespace BasicSharp.Compiler.Lexer
         ByteLiteral,
 
         WhitespaceTrivia,
-        MultiLineCommentTrivia,
         SingleLineCommentTrivia,
     }
 }
