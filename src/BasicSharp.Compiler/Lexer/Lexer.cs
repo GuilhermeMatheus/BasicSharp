@@ -31,6 +31,9 @@ namespace BasicSharp.Compiler.Lexer
 
                 switch (ch)
                 {
+                    case '/':
+                        yield return scanComment();
+                        break;
                     case '0':
                     case '1':
                     case '2':
@@ -66,7 +69,7 @@ namespace BasicSharp.Compiler.Lexer
             {
                 doublePlace = scanIntegerLiteral();
                 if (doublePlace == null)
-                    throw new Exception("Char '" + text.Next() + "' not expected in DoublePlace chain");
+                    throw SyntacticException.SymbolNotExpected(text, text.Next(), SyntaxKind.DoubleLiteral, SyntaxKind.IntegerLiteral);
             }
             else
             {
@@ -88,7 +91,7 @@ namespace BasicSharp.Compiler.Lexer
                 if (text.Peek().IsBinary())
                     stringValue += text.Next();
                 else
-                    throw new Exception("Char '" + text.Next() + "' not expected in Byte chain");
+                    throw SyntacticException.SymbolNotExpected(text, text.Next(), SyntaxKind.ByteLiteral, "0", "1");
             }
 
             ret.End = ret.Begin + stringValue.Length;
@@ -107,10 +110,9 @@ namespace BasicSharp.Compiler.Lexer
 
             return result;
         }
-               
         TokenInfo scanIntegerLiteral()
         {
-            var ret = new TokenInfo { Begin = text.Position };
+            var ret = new TokenInfo { Begin = text.Position, Kind = SyntaxKind.IntegerLiteral };
             var stringValue = string.Empty;
 
             while(Char.IsDigit(text.Peek()))
@@ -122,6 +124,23 @@ namespace BasicSharp.Compiler.Lexer
             ret.StringValue = stringValue;
             ret.IntValue = int.Parse(stringValue);
             ret.End = ret.Begin + stringValue.Length;
+
+            return ret;
+        }
+
+        TokenInfo scanComment()
+        {
+            var ret = new TokenInfo { Begin = text.Position };
+            var stringValue = string.Empty;
+
+            if (text.AdvanceIfMatches("//"))
+            {
+                ret.Kind = SyntaxKind.SingleLineCommentTrivia;
+            }
+            else
+            {
+                throw SyntacticException.SymbolNotExpected(text, text.Peek(1), SyntaxKind.SingleLineCommentTrivia, "/");
+            }
 
             return ret;
         }

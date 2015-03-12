@@ -42,6 +42,7 @@
     <Compile Include="Lexer\Extensions\TokenInfoExtensions.cs" />
     <Compile Include="Lexer\Lexer.cs" />
     <Compile Include="Lexer\SlidingText.cs" />
+    <Compile Include="Lexer\SyntacticException.cs" />
     <Compile Include="Lexer\Token\SyntaxKind.cs" />
     <Compile Include="Lexer\Token\TokenInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
