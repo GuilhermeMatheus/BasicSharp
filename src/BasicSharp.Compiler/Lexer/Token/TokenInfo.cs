@@ -13,6 +13,7 @@ namespace BasicSharp.Compiler.Lexer
         public int End { get; set; }
 
         public string StringValue { get; set; }
+        public char CharValue { get; set; }
         public int IntValue { get; set; }
         public bool BooleanValue { get; set; }
         public byte ByteValue { get; set; }

@@ -34,6 +34,12 @@ namespace BasicSharp.Compiler.Lexer
                     case '/':
                         yield return scanComment();
                         break;
+                    case '"':
+                        yield return scanStringLiteral();
+                        break;
+                    case '\'':
+                        yield return scanCharLiteral();
+                        break;
                     case '0':
                     case '1':
                     case '2':
@@ -53,6 +59,77 @@ namespace BasicSharp.Compiler.Lexer
             }
         }
 
+        TokenInfo scanComment()
+        {
+            var ret = new TokenInfo { Begin = text.Position, Kind = SyntaxKind.SingleLineCommentTrivia };
+            var stringValue = "//";
+
+            if (!text.Peek().Equals('/'))
+                return null;
+
+            if (text.AdvanceIfMatches("//"))
+                while (!text.Peek().IsLineBreak())
+                    stringValue += text.Next();
+            else
+                throw SyntacticException.SymbolNotExpected(text, text.Peek(1).ToString(), SyntaxKind.SingleLineCommentTrivia, "/");
+
+            ret.StringValue = stringValue;
+            ret.End = ret.Begin + stringValue.Length;
+
+            return ret;
+        }
+        
+        TokenInfo scanStringLiteral()
+        {
+            var ret = new TokenInfo { Begin = text.Position, Kind = SyntaxKind.StringLiteral };
+            var stringValue = "\"";
+
+            if (text.AdvanceIfMatches("\""))
+            {
+                char c;
+                while ((c = text.Peek()) != '"')
+                {
+                    if (c.IsLineBreak())
+                        throw SyntacticException.SymbolNotExpected(text, "line ending", SyntaxKind.StringLiteral, "\"");
+
+                    stringValue += text.Next();
+                }
+                stringValue += c;
+            }
+            else
+                return null;
+
+            ret.StringValue = stringValue;
+            ret.End = ret.Begin + stringValue.Length;
+
+            return ret;
+        }
+
+        TokenInfo scanCharLiteral()
+        {
+            var ret = new TokenInfo { Begin = text.Position, Kind = SyntaxKind.CharLiteral };
+            var stringValue = string.Empty;
+
+            if (!text.Peek().Equals('\''))
+                return null;
+            
+            stringValue += text.Next();
+            if (text.Peek().Equals('\''))
+                throw SyntacticException.SymbolNotExpected(text, text.Peek().ToString(), SyntaxKind.CharLiteral, "an character after ' token.");
+
+            stringValue += text.Next();
+            if (!text.Peek().Equals('\''))
+                throw SyntacticException.SymbolNotExpected(text, text.Peek().ToString(), SyntaxKind.CharLiteral, "\"'\"");
+            
+            stringValue += text.Next();
+
+            ret.StringValue = stringValue;
+            ret.CharValue = stringValue[1];
+            ret.End = ret.Begin + stringValue.Length;
+
+            return ret;
+        }
+
         TokenInfo scanNumericLiteral()
         {
             var tryByteLiteral = scanByteLiteral();
@@ -69,7 +146,7 @@ namespace BasicSharp.Compiler.Lexer
             {
                 doublePlace = scanIntegerLiteral();
                 if (doublePlace == null)
-                    throw SyntacticException.SymbolNotExpected(text, text.Next(), SyntaxKind.DoubleLiteral, SyntaxKind.IntegerLiteral);
+                    throw SyntacticException.SymbolNotExpected(text, text.Next().ToString(), SyntaxKind.DoubleLiteral, SyntaxKind.IntegerLiteral);
             }
             else
             {
@@ -91,7 +168,7 @@ namespace BasicSharp.Compiler.Lexer
                 if (text.Peek().IsBinary())
                     stringValue += text.Next();
                 else
-                    throw SyntacticException.SymbolNotExpected(text, text.Next(), SyntaxKind.ByteLiteral, "0", "1");
+                    throw SyntacticException.SymbolNotExpected(text, text.Next().ToString(), SyntaxKind.ByteLiteral, "0", "1");
             }
 
             ret.End = ret.Begin + stringValue.Length;
@@ -124,23 +201,6 @@ namespace BasicSharp.Compiler.Lexer
             ret.StringValue = stringValue;
             ret.IntValue = int.Parse(stringValue);
             ret.End = ret.Begin + stringValue.Length;
-
-            return ret;
-        }
-
-        TokenInfo scanComment()
-        {
-            var ret = new TokenInfo { Begin = text.Position };
-            var stringValue = string.Empty;
-
-            if (text.AdvanceIfMatches("//"))
-            {
-                ret.Kind = SyntaxKind.SingleLineCommentTrivia;
-            }
-            else
-            {
-                throw SyntacticException.SymbolNotExpected(text, text.Peek(1), SyntaxKind.SingleLineCommentTrivia, "/");
-            }
 
             return ret;
         }

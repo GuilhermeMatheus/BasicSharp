@@ -18,5 +18,15 @@ namespace BasicSharp.Utils
             return c == '0' || c == '1';
         }
 
+        public static bool IsLineBreak(this char c)
+        {
+            return c == '\n' || c == '\r';
+        }
+
+        public static bool IsCharacter(this char c)
+        {
+            var asciiValue = (int)c;
+            return (c >= 65 && c <= 90) || (c >= 97 && c <= 122);
+        }
     }
 }
