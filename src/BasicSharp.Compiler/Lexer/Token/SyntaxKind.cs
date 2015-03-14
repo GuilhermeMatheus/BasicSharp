@@ -8,29 +8,57 @@ namespace BasicSharp.Compiler.Lexer
 {
     public enum SyntaxKind
     {
-        Namespace,
+        None = 0,
+
         Identifier,
 
-        OpenBraceToken,
-        CloseBraceToken,
         OpenBracketToken,
         CloseBracketToken,
+        OpenBraceToken,
+        CloseBraceToken,
+        OpenParenToken,
+        CloseParenToken,
         DotToken,
+        SemicolonToken,
         CommaToken,
-        MinusToken,
-        PlusToken,
+
         EqualsToken,
+        EqualsEqualsToken,
+        MinorToken,
+        MinorEqualsToken,
+        MajorToken,
+        MajorEqualsToken,
+        ModToken,
+
+        PlusEqualsToken,
+        PlusToken,
+        MinusEqualsToken,
+        MinusToken,
+        AsteriskToken,
+        AsteriskEqualsToken,
+        SlashToken,
+        SlashEqualsToken,
 
         ModuleKeyword,
+        ImplementsDirectiveKeyword,
+
+        VoidKeyword,
         IntKeyword,
+        DoubleKeyword,
         ByteKeyword,
         StringKeyword,
+        CharKeyword,
+        VarKeyword,
+
         EverybodyKeyword,
         MyKeyword,
+        
         IfKeyword,
         ElseKeyword,
         TrueKeyword,
         FalseKeyword,
+
+        WhileKeyword,
         ForKeyword,
 
         StringLiteral,
@@ -39,6 +67,7 @@ namespace BasicSharp.Compiler.Lexer
         DoubleLiteral,
         ByteLiteral,
 
+        EndOfLineTrivia,
         WhitespaceTrivia,
         SingleLineCommentTrivia,
     }

@@ -14,7 +14,7 @@ namespace BasicSharp.Compiler.Lexer
         public SyntaxKind[] ExpectedSyntaxes { get; private set; }
         public string[] ExpectedStrings { get; private set; }
 
-        SyntacticException() { }
+        SyntacticException(string message) : base(message) { }
 
         public static SyntacticException SymbolNotExpected(SlidingText textSource, string symbol, SyntaxKind malformedSyntax, params SyntaxKind[] expectedSyntaxes)
         {
@@ -23,7 +23,7 @@ namespace BasicSharp.Compiler.Lexer
             if (expectedSyntaxes != null && expectedSyntaxes.Any())
                 message += string.Format("Expected {2}", string.Join(", ", expectedSyntaxes));
 
-            return new SyntacticException
+            return new SyntacticException(message)
                 {
                     TextSource = textSource,
                     Symbol = symbol,
@@ -37,9 +37,9 @@ namespace BasicSharp.Compiler.Lexer
             var message = string.Format("Symbol '{0}' not expected in chain of type {1}. ", symbol, malformedSyntax);
 
             if (expectedStrings != null && expectedStrings.Any())
-                message += string.Format("Expected {2}", string.Join(", ", expectedStrings));
+                message += string.Format("Expected {0}", string.Join(", ", expectedStrings));
 
-            return new SyntacticException
+            return new SyntacticException(message)
             {
                 TextSource = textSource,
                 Symbol = symbol,

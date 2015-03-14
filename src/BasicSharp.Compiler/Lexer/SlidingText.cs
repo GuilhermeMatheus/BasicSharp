@@ -118,6 +118,9 @@ namespace BasicSharp.Compiler.Lexer
         /// Otherwise, returns false</returns>
         public bool AdvanceIfMatches(string desired)
         {
+            if (desired.Length == 1)
+                return AdvanceIfMatches(desired[0]);
+
             var result = Matches(desired);
             
             if (result)
