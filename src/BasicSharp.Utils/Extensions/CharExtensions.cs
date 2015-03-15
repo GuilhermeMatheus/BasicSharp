@@ -26,7 +26,10 @@ namespace BasicSharp.Utils
         public static bool IsCharacter(this char c)
         {
             var asciiValue = (int)c;
-            return (c >= 65 && c <= 90) || (c >= 97 && c <= 122);
+            var isUpperCaseChar = c >= 65 && c <= 90;
+            var isLowerCaseChar = c >= 97 && c <= 122;
+
+            return  isUpperCaseChar || isLowerCaseChar || c == '_';
         }
     }
 }

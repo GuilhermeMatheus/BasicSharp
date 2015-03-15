@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace BasicSharp.Compiler.Lexer
 {
+    [DebuggerDisplay("Kind = {Kind},\nStringValue = {StringValue}")]
     public class TokenInfo
     {
         public SyntaxKind Kind { get; set; }
         public int Begin { get; set; }
         public int End { get; set; }
+        public bool IsMalformedToken { get; set; }
 
         public string StringValue { get; set; }
         public char CharValue { get; set; }
@@ -33,6 +36,7 @@ namespace BasicSharp.Compiler.Lexer
             {
                 int hash = 17;
 
+                hash = hash * 23 + IsMalformedToken.GetHashCode();
                 hash = hash * 23 + Kind.GetHashCode();
                 hash = hash * 23 + Begin.GetHashCode();
                 hash = hash * 23 + End.GetHashCode();
@@ -48,5 +52,6 @@ namespace BasicSharp.Compiler.Lexer
             }
         }
         #endregion
+
     }
 }

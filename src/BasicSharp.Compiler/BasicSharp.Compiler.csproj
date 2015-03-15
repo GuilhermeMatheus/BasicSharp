@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Lexer\Extensions\SyntacticExceptions.cs" />
     <Compile Include="Lexer\Extensions\TokenInfoExtensions.cs" />
     <Compile Include="Lexer\Lexer.cs" />
     <Compile Include="Lexer\SlidingText.cs" />

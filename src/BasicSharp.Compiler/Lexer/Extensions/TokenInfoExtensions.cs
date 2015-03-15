@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BasicSharp.Compiler.Lexer
+namespace BasicSharp.Compiler.Lexer.Extensions
 {
     public static class TokenInfoExtensions
     {
@@ -21,7 +21,8 @@ namespace BasicSharp.Compiler.Lexer
                 StringValue = stringValue,
                 DoubleValue = double.Parse(stringValue, CultureInfo.InvariantCulture),
                 Begin = begin,
-                End = end
+                End = end,
+                IsMalformedToken = lessSignificantPart.IsMalformedToken || moreSignificantPart.IsMalformedToken
             };
         }
     }

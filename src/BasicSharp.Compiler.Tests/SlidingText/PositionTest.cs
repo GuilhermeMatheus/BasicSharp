@@ -16,7 +16,7 @@ namespace BasicSharp.Compiler.Tests.SlidingText
             for (int i = 0; i < source.Length; i++)
                 text.Peek(i);
 
-            text.Position.Should().Be(0, "because Next has never been called");
+            text.Offset.Should().Be(0, "because Next has never been called");
         }
 
         [TestMethod]
@@ -27,7 +27,7 @@ namespace BasicSharp.Compiler.Tests.SlidingText
 
             text.Next(5);
 
-            text.Position.Should().Be(5, "because Next has been called by 5 times");
+            text.Offset.Should().Be(5, "because Next has been called by 5 times");
         }
     }
 }

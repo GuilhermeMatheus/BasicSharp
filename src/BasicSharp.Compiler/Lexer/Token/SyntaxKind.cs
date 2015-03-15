@@ -69,6 +69,7 @@ namespace BasicSharp.Compiler.Lexer
 
         EndOfLineTrivia,
         WhitespaceTrivia,
+        TabTrivia,
         SingleLineCommentTrivia,
     }
 }

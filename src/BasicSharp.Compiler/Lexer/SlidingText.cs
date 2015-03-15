@@ -17,7 +17,16 @@ namespace BasicSharp.Compiler.Lexer
         readonly StreamReader stream;
         Queue<char> peekBuffer;
 
-        public int Position { get; private set; }
+        /// <summary>
+        /// Representa a linha relativa à InitialPosition
+        /// </summary>
+        public int Line { get; private set; }
+        /// <summary>
+        /// Representa a coluna relativa à InitialPosition
+        /// </summary>
+        public int Column { get; private set; }
+        public int InitialPosition { get; private set; }
+        public int Offset { get; private set; }
 
         /// <summary>
         /// Inicializa uma nova instância de BasicSharp.Compiler.Lexer.SlidingText
@@ -31,23 +40,44 @@ namespace BasicSharp.Compiler.Lexer
 
             this.stream = new StreamReader(sourceStream);
             this.peekBuffer = new Queue<char>();
+            this.Reset(0);
         }
 
         public void Reset(int position)
         {
-            this.stream.BaseStream.Position = this.Position = position;
+            this.stream.BaseStream.Position = this.InitialPosition = position;
+            this.Offset = this.Column = 0;
+            this.Line = 1;
+
             this.stream.DiscardBufferedData();
             this.peekBuffer.Clear();
         }
 
         public char Next()
         {
-            Position++;
+            Offset++;
             if (peekBuffer.Count > 0)
-                return peekBuffer.Dequeue();
+                return updateLineColumn(peekBuffer.Dequeue());
 
             var c = stream.Read();
-            return charOrInvalidCharFrom(c);
+            return updateLineColumn(charOrInvalidCharFrom(c));
+        }
+
+        //Este método deve ser chamado apenas em Next(), pois ele é o único que deve atualizar a posição do leitor
+        char updateLineColumn(char c)
+        {
+            if (c == INVALID_CHAR)
+                return c;
+
+            if (c == '\r')
+            {
+                this.Line++;
+                this.Column = 0;
+            }
+            else
+                this.Column++;
+
+            return c;
         }
 
         public char Next(int jumps)

@@ -8,44 +8,12 @@ namespace BasicSharp.Compiler.Lexer
 {
     public class SyntacticException : Exception
     {
-        public SlidingText TextSource { get; private set; }
-        public string Symbol { get; private set; }
-        public SyntaxKind MalformedSyntax { get; private set; }
-        public SyntaxKind[] ExpectedSyntaxes { get; private set; }
-        public string[] ExpectedStrings { get; private set; }
+        public SlidingText TextSource { get; set; }
+        public string Symbol { get; set; }
+        public TokenInfo MalformedToken { get; set; }
+        public SyntaxKind[] ExpectedSyntaxes { get; set; }
+        public string[] ExpectedStrings { get; set; }
 
-        SyntacticException(string message) : base(message) { }
-
-        public static SyntacticException SymbolNotExpected(SlidingText textSource, string symbol, SyntaxKind malformedSyntax, params SyntaxKind[] expectedSyntaxes)
-        {
-            var message =string.Format("Symbol '{0}' not expected in chain of type {1}. ", symbol, malformedSyntax);
-
-            if (expectedSyntaxes != null && expectedSyntaxes.Any())
-                message += string.Format("Expected {2}", string.Join(", ", expectedSyntaxes));
-
-            return new SyntacticException(message)
-                {
-                    TextSource = textSource,
-                    Symbol = symbol,
-                    MalformedSyntax = malformedSyntax,
-                    ExpectedSyntaxes = expectedSyntaxes
-                };
-        }
-
-        public static SyntacticException SymbolNotExpected(SlidingText textSource, string symbol, SyntaxKind malformedSyntax, params string[] expectedStrings)
-        {
-            var message = string.Format("Symbol '{0}' not expected in chain of type {1}. ", symbol, malformedSyntax);
-
-            if (expectedStrings != null && expectedStrings.Any())
-                message += string.Format("Expected {0}", string.Join(", ", expectedStrings));
-
-            return new SyntacticException(message)
-            {
-                TextSource = textSource,
-                Symbol = symbol,
-                MalformedSyntax = malformedSyntax,
-                ExpectedStrings = expectedStrings
-            };
-        }
+        public SyntacticException(string message) : base(message) { }
     }
 }
