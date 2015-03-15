@@ -262,6 +262,8 @@ namespace BasicSharp.Compiler.Lexer
                     return SyntaxKind.MyKeyword;
                 case "everybody":
                     return SyntaxKind.EverybodyKeyword;
+                case "return":
+                    return SyntaxKind.ReturnKeyword;
                 case "if":
                     return SyntaxKind.IfKeyword;
                 case "else":

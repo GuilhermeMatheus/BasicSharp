@@ -52,7 +52,8 @@ namespace BasicSharp.Compiler.Lexer
 
         EverybodyKeyword,
         MyKeyword,
-        
+        ReturnKeyword,
+
         IfKeyword,
         ElseKeyword,
         TrueKeyword,
