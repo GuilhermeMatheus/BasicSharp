@@ -12,7 +12,7 @@ namespace BasicSharp.Compiler.Lexer
 {
     public class Lexer
     {
-        SlidingText text;
+        readonly SlidingText text;
 
         List<SyntacticException> _syntacticErrors;
         public ReadOnlyCollection<SyntacticException> SyntacticErrors
