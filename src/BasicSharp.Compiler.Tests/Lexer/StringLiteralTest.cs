@@ -15,9 +15,9 @@ namespace BasicSharp.Compiler.Tests.Lexer
         [TestMethod]
         public void GetTokens_WhenReadString_MustReturnStringToken()
         {
-            var text = SlidingTextSources.GetSlidingTextWith("\"comment here\"");
+            var text = SlidingTextFactory.FromString("\"comment here\"");
             var lexer = new lxr.Lexer(text);
-
+            
             var expected = new TokenInfo
             {
                 Begin = 0,

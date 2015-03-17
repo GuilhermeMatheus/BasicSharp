@@ -9,7 +9,6 @@ namespace BasicSharp.Utils
 {
     public static class StringExtensions
     {
-
         public static MemoryStream GetMemoryStream(this string source)
         {
             var inBytes = Encoding.Default.GetBytes(source);

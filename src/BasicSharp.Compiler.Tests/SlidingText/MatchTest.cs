@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FluentAssertions;
+using BasicSharp.Compiler.Lexer;
 
 namespace BasicSharp.Compiler.Tests.SlidingText
 {
@@ -12,7 +13,7 @@ namespace BasicSharp.Compiler.Tests.SlidingText
         [TestMethod]
         public void AdvanceIfMatches_WhenMatches_MustReturnTrue()
         {
-            var text = SlidingTextSources.GetSlidingTextWithFor();
+            var text = SlidingTextFactory.FromString("0123456789 for");
             var desired = "012345";
 
             var match = text.AdvanceIfMatches(desired);
@@ -23,7 +24,7 @@ namespace BasicSharp.Compiler.Tests.SlidingText
         [TestMethod]
         public void AdvanceIfMatches_WhenMatches_MustAdvance()
         {
-            var text = SlidingTextSources.GetSlidingTextWithFor();
+            var text = SlidingTextFactory.FromString("0123456789 for");
             var desired = "012345";
 
             var match = text.AdvanceIfMatches(desired);

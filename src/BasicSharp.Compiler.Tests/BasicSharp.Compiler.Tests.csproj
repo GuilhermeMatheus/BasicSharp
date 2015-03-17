@@ -61,12 +61,13 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Lexer\ChainTest.cs" />
     <Compile Include="Lexer\NumericLiteralTest.cs" />
     <Compile Include="Lexer\StringLiteralTest.cs" />
+    <Compile Include="Lexer\BooleanTest.cs" />
     <Compile Include="SlidingText\PeekTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SlidingText\MatchTest.cs" />
-    <Compile Include="SlidingText\SlidingTextSources.cs" />
     <Compile Include="SlidingText\PositionTest.cs" />
   </ItemGroup>
   <ItemGroup>

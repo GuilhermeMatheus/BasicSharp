@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FluentAssertions;
+using BasicSharp.Compiler.Lexer;
 
 namespace BasicSharp.Compiler.Tests.SlidingText
 {
@@ -11,7 +12,7 @@ namespace BasicSharp.Compiler.Tests.SlidingText
         public void Position_WhenJustPeeking_ShouldBeZero()
         {
             var source = "123.123.123";
-            var text = SlidingTextSources.GetSlidingTextWith(source);
+            var text = SlidingTextFactory.FromString(source);
 
             for (int i = 0; i < source.Length; i++)
                 text.Peek(i);
@@ -23,7 +24,7 @@ namespace BasicSharp.Compiler.Tests.SlidingText
         public void Position_WhenCallingNext_ShouldBeCorrect()
         {
             var source = "123.123.123";
-            var text = SlidingTextSources.GetSlidingTextWith(source);
+            var text = SlidingTextFactory.FromString(source);
 
             text.Next(5);
 

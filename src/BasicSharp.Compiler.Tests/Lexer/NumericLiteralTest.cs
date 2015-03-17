@@ -15,7 +15,7 @@ namespace BasicSharp.Compiler.Tests.Lexer
         [TestMethod]
         public void GetTokens_WhenReadFloat_MustReturnFloatToken()
         {
-            var text = SlidingTextSources.GetSlidingTextWith("123.123");
+            var text = SlidingTextFactory.FromString("123.123");
             var lexer = new lxr.Lexer(text);
 
             var expected = new TokenInfo
@@ -33,7 +33,7 @@ namespace BasicSharp.Compiler.Tests.Lexer
         [TestMethod]
         public void GetTokens_WhenReadByte_MustReturnByteToken()
         {
-            var text = SlidingTextSources.GetSlidingTextWith("0b01000100");
+            var text = SlidingTextFactory.FromString("0b01000100");
             var lexer = new lxr.Lexer(text);
 
             var expected = new TokenInfo

@@ -8,6 +8,7 @@ using System.Text;
 namespace BasicSharp.Compiler.Tests.SlidingText
 {
     using Text = BasicSharp.Compiler.Lexer.SlidingText;
+    using BasicSharp.Compiler.Lexer;
     
     [TestClass]
     public class PeekTest
@@ -16,7 +17,7 @@ namespace BasicSharp.Compiler.Tests.SlidingText
         public void JumpUntil_WithChar_IndexValidation()
         {
             var source = "0123456789 for";
-            var text = SlidingTextSources.GetSlidingTextWithFor();
+            var text = SlidingTextFactory.FromString(source);
 
             var jumpsToFor = text.JumpUntil('f');
 
@@ -27,7 +28,7 @@ namespace BasicSharp.Compiler.Tests.SlidingText
         [TestMethod]
         public void Peek_WithJumps_MustAlwaysReturnTheSameValue()
         {
-            var text = SlidingTextSources.GetSlidingTextWithFor();
+            var text = SlidingTextFactory.FromString("0123456789 for");
 
             text.Peek(2).Should().Be(text.Peek(2), "because we dont dont changed the index of the SlidingText");
             text.Peek(0).Should().Be(text.Peek(), "because the calls must be equivalent");
@@ -39,13 +40,11 @@ namespace BasicSharp.Compiler.Tests.SlidingText
         [TestMethod]
         public void JumpUntilAndPeek_ShouldBeEquivalent()
         {
-            var text = SlidingTextSources.GetSlidingTextWithFor();
+            var text = SlidingTextFactory.FromString("0123456789 for");
 
             var indexToF = text.JumpUntil('f');
             text.Reset(0);
             text.Peek(indexToF).Should().Be('f', "because de index must be the same");
         }
-
-        
     }
 }

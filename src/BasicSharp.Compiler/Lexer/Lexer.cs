@@ -240,7 +240,7 @@ namespace BasicSharp.Compiler.Lexer
             if (string.IsNullOrEmpty(stringValue))
                 return null;
 
-            var kind = getKeywordKind(stringValue);
+            var kind = getKeywordKind(stringValue, ret);
             if (kind == SyntaxKind.None)
                 kind = SyntaxKind.Identifier;
 
@@ -250,7 +250,7 @@ namespace BasicSharp.Compiler.Lexer
 
             return ret;
         }
-        SyntaxKind getKeywordKind(string text)
+        SyntaxKind getKeywordKind(string text, TokenInfo currentToken)
         {
             switch (text)
             {
@@ -258,6 +258,8 @@ namespace BasicSharp.Compiler.Lexer
                     return SyntaxKind.ForKeyword;
                 case "while":
                     return SyntaxKind.WhileKeyword;
+                case "break":
+                    return SyntaxKind.BreakKeyword;
                 case "my":
                     return SyntaxKind.MyKeyword;
                 case "everybody":
@@ -270,6 +272,14 @@ namespace BasicSharp.Compiler.Lexer
                     return SyntaxKind.ElseKeyword;
                 case "module":
                     return SyntaxKind.ModuleKeyword;
+                case "null":
+                    return SyntaxKind.NullKeyword;
+                case "true":
+                    currentToken.BooleanValue = true;
+                    return SyntaxKind.TrueKeyword;
+                case "false":
+                    currentToken.BooleanValue = false;
+                    return SyntaxKind.FalseKeyword;
                 case "void":
                     return SyntaxKind.VoidKeyword;
                 case "int":

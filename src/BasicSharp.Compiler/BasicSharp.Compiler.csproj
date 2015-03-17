@@ -42,7 +42,9 @@
     <Compile Include="Lexer\Extensions\SyntacticExceptions.cs" />
     <Compile Include="Lexer\Extensions\TokenInfoExtensions.cs" />
     <Compile Include="Lexer\Lexer.cs" />
+    <Compile Include="Lexer\Factories\LexerFactory.cs" />
     <Compile Include="Lexer\SlidingText.cs" />
+    <Compile Include="Lexer\Factories\SlidingTextFactory.cs" />
     <Compile Include="Lexer\SyntacticException.cs" />
     <Compile Include="Lexer\Token\SyntaxKind.cs" />
     <Compile Include="Lexer\Token\TokenInfo.cs" />

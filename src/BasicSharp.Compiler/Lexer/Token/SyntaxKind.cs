@@ -42,6 +42,7 @@ namespace BasicSharp.Compiler.Lexer
         ModuleKeyword,
         ImplementsDirectiveKeyword,
 
+        NullKeyword,
         VoidKeyword,
         IntKeyword,
         DoubleKeyword,
@@ -61,6 +62,7 @@ namespace BasicSharp.Compiler.Lexer
 
         WhileKeyword,
         ForKeyword,
+        BreakKeyword,
 
         StringLiteral,
         CharLiteral,
