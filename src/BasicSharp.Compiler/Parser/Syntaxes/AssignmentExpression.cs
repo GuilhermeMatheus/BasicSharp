@@ -7,6 +7,11 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 {
     public class AssignmentExpression : SyntaxNode
     {
-        
+
+        public override IEnumerable<Lexer.TokenInfo> GetInternalTokens()
+        {
+            yield break;
+        }
+
     }
 }

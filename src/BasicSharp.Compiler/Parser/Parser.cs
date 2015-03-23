@@ -42,13 +42,14 @@ namespace BasicSharp.Compiler.Parser
                 return null;
 
             var type = consumeCurrentTokenAndGetNext();
-            if (!type.Kind.IsNotContextualType())
+            if (!type.Kind.IsTypeNotContextual())
                 throw null; //Type esperado, etc etc
 
             var identifier = consumeCurrentTokenAndGetNext();
             if (identifier.Kind != SyntaxKind.Identifier)
                 throw null; //Type esperado, etc etc
 
+            consumeCurrentTokenAndGetNext();
             var parameterList = getParameterList();
             if (parameterList != null)
                 return new MethodDeclaration
@@ -63,7 +64,7 @@ namespace BasicSharp.Compiler.Parser
             return getFieldDeclaration(modifier, type, identifier);
         }
 
-        private FieldDeclaration getFieldDeclaration(TokenInfo modifier, TokenInfo type, TokenInfo identifier)
+        FieldDeclaration getFieldDeclaration(TokenInfo modifier, TokenInfo type, TokenInfo identifier)
         {
             var result = new FieldDeclaration { Modifier = modifier };
 
@@ -123,6 +124,53 @@ namespace BasicSharp.Compiler.Parser
             throw new NotImplementedException();
         }
 
+        ParameterList getParameterList()
+        {
+            var openParen = currentToken();
+            if (openParen.Kind != SyntaxKind.OpenParenToken)
+                return null;
+
+            var result = new ParameterList { OpenParenToken = openParen };
+            consumeCurrentTokenAndGetNext();
+            
+            Parameter currParam;
+            while ((currParam = getParameter()) != null) {
+                dumpTriviaBufferInto(result);
+                result.AddParameter(currParam);
+
+                var comma = currentToken();
+                if (comma.Kind == SyntaxKind.CommaToken) {
+                    dumpTriviaBufferInto(result);
+                    result.AddTrivia(comma);
+                    consumeCurrentTokenAndGetNext();
+                }
+            }
+
+            var closeParen = currentToken();
+            if (closeParen.Kind != SyntaxKind.CloseParenToken)
+                throw null;
+
+            dumpTriviaBufferInto(result);
+            result.CloseParenToken = closeParen;
+
+            return result;
+        }
+        Parameter getParameter()
+        {
+            var type = currentToken();
+            if (!type.Kind.IsTypeNotContextual())
+                return null;
+
+            var identifier = consumeCurrentTokenAndGetNext();
+            if (identifier.Kind != SyntaxKind.Identifier)
+                throw null;
+
+            consumeCurrentTokenAndGetNext();
+            var result = new Parameter { Type = type, Identifier = identifier };
+            dumpTriviaBufferInto(result);
+
+            return result;
+        }
         //MethodDeclaration ::=  Modifier? Method_Type Identifier Parameters_List Block
         MethodDeclaration getMethod()
         {
@@ -130,14 +178,7 @@ namespace BasicSharp.Compiler.Parser
         }
         Block getBlock()
         {
-            throw new NotImplementedException();
-        }
-        ParameterList getParameterList()
-        {
-            throw new NotImplementedException();
-        }
-        Parameter getParameter()
-        {
+            return new Block();
             throw new NotImplementedException();
         }
         #endregion

@@ -14,5 +14,16 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
         public VariableDeclarator Declarator { get; internal set; }
 
         public TokenInfo SemiColon { get; internal set; }
+
+        public override IEnumerable<TokenInfo> GetInternalTokens()
+        {
+            yield return Modifier;
+
+            if (Declarator != null)
+                foreach (var item in Declarator.GetInternalTokens())
+                    yield return item;
+            
+            yield return SemiColon;
+        }
     }
 }

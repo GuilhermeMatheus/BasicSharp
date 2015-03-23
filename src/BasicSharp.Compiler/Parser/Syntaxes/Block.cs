@@ -8,5 +8,9 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 {
     public class Block : SyntaxNode
     {
+        public override IEnumerable<Lexer.TokenInfo> GetInternalTokens()
+        {
+            yield break;
+        }
     }
 }

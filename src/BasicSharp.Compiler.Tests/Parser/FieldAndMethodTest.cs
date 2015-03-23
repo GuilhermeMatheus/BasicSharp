@@ -11,7 +11,9 @@ namespace BasicSharp.Compiler.Tests.Parser
         public void AST_WhenReadingMethodsAndFieldsDeclarations()
         {
             var parser = ParserFactory.FromString("my void m(int a, int b) { }");
-            parser.GetSyntax();
+            var result = parser.GetSyntax().ToString();
+            result.ToString();
+
 
             Assert.AreEqual(1, 1);
         }

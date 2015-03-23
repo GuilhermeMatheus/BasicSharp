@@ -11,30 +11,30 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
     public class ParameterList : SyntaxNode
     {
         List<Parameter> parameters = new List<Parameter>();
-        List<TokenInfo> commas = new List<TokenInfo>();
 
-        public TokenInfo OpenParenToken { get; private set; }
+        public TokenInfo OpenParenToken { get; internal set; }
 
         public ReadOnlyCollection<Parameter> Parameters
         {
             get { return new ReadOnlyCollection<Parameter>(parameters); }
         }
 
-        public ReadOnlyCollection<TokenInfo> Commas
-        {
-            get { return new ReadOnlyCollection<TokenInfo>(commas); }
-        }
-
-        public TokenInfo CloseParenToken { get; private set; }
+        public TokenInfo CloseParenToken { get; internal set; }
 
         public void AddParameter(Parameter parameter)
         {
             this.parameters.Add(parameter);
         }
 
-        public void AddComma(TokenInfo commaToken)
+        public override IEnumerable<TokenInfo> GetInternalTokens()
         {
-            commas.Add(commaToken);
+            yield return OpenParenToken;
+
+            foreach (var param in parameters)
+                foreach (var item in param.GetInternalTokens())
+                    yield return item;
+
+            yield return CloseParenToken;
         }
     }
 }

@@ -30,5 +30,14 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 
             return result;
         }
+
+        public override IEnumerable<TokenInfo> GetInternalTokens()
+        {
+            yield return Type;
+
+            foreach (var decl in declarators)
+                foreach (var item in decl.GetInternalTokens())
+                    yield return item;
+        }
     }
 }

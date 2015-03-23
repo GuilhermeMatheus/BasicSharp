@@ -10,5 +10,13 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
     {
         public TokenInfo Identifier { get; set; }
         public AssignmentExpression Assignment { get; set; }
+
+        public override IEnumerable<TokenInfo> GetInternalTokens()
+        {
+            yield return Identifier;
+            if (Assignment != null)
+                foreach (var item in Assignment.GetInternalTokens())
+                    yield return item;
+        }
     }
 }

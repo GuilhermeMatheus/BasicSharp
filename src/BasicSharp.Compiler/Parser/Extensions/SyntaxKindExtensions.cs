@@ -15,7 +15,7 @@ namespace BasicSharp.Compiler.Parser.Extensions
                    syntaxKind == SyntaxKind.MyKeyword;
         }
 
-        public static bool IsNotContextualType(this SyntaxKind syntaxKind)
+        public static bool IsTypeNotContextual(this SyntaxKind syntaxKind)
         {
             switch (syntaxKind)
             {
