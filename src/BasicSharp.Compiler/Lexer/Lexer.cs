@@ -282,6 +282,8 @@ namespace BasicSharp.Compiler.Lexer
                     return SyntaxKind.FalseKeyword;
                 case "void":
                     return SyntaxKind.VoidKeyword;
+                case "bool":
+                    return SyntaxKind.BoolKeyword;
                 case "int":
                     return SyntaxKind.IntKeyword;
                 case "double":

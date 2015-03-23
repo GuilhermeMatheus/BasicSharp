@@ -48,8 +48,18 @@
     <Compile Include="Lexer\SyntacticException.cs" />
     <Compile Include="Lexer\Token\SyntaxKind.cs" />
     <Compile Include="Lexer\Token\TokenInfo.cs" />
+    <Compile Include="Parser\Extensions\SyntaxKindExtensions.cs" />
+    <Compile Include="Parser\Factories\ParserFactory.cs" />
+    <Compile Include="Parser\Syntaxes\AssignmentExpression.cs" />
     <Compile Include="Parser\Parser.cs" />
-    <Compile Include="Parser\Syntaxes\Syntax.cs" />
+    <Compile Include="Parser\Syntaxes\Block.cs" />
+    <Compile Include="Parser\Syntaxes\FieldDeclaration.cs" />
+    <Compile Include="Parser\Syntaxes\MethodDeclaration.cs" />
+    <Compile Include="Parser\Syntaxes\Parameter.cs" />
+    <Compile Include="Parser\Syntaxes\ParameterList.cs" />
+    <Compile Include="Parser\Syntaxes\SyntaxNode.cs" />
+    <Compile Include="Parser\Syntaxes\VariableDeclaration.cs" />
+    <Compile Include="Parser\Syntaxes\VariableDeclarator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

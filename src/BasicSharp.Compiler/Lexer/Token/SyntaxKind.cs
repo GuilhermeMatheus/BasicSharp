@@ -45,6 +45,7 @@ namespace BasicSharp.Compiler.Lexer
         NullKeyword,
         VoidKeyword,
         IntKeyword,
+        BoolKeyword,
         DoubleKeyword,
         ByteKeyword,
         StringKeyword,
