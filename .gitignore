@@ -229,3 +229,4 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+src/BasicSharp.Compiler.Tests/Lexer/UnitTest1.cs
