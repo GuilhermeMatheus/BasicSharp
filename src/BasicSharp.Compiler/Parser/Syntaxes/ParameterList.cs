@@ -31,7 +31,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             yield return OpenParenToken;
 
             foreach (var param in parameters)
-                foreach (var item in param.GetInternalTokens())
+                foreach (var item in param.Tokens)
                     yield return item;
 
             yield return CloseParenToken;

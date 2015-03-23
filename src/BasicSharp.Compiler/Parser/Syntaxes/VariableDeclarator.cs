@@ -15,7 +15,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
         {
             yield return Identifier;
             if (Assignment != null)
-                foreach (var item in Assignment.GetInternalTokens())
+                foreach (var item in Assignment.Tokens)
                     yield return item;
         }
     }

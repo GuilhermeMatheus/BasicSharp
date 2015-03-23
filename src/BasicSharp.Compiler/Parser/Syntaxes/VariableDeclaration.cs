@@ -36,7 +36,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             yield return Type;
 
             foreach (var decl in declarators)
-                foreach (var item in decl.GetInternalTokens())
+                foreach (var item in decl.Tokens)
                     yield return item;
         }
     }

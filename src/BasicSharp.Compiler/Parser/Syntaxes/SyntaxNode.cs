@@ -35,7 +35,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
         {
             var result = string.Empty;
 
-            foreach (var item in GetInternalTokens())
+            foreach (var item in Tokens)
                 result += item.StringValue;
 
             return result;

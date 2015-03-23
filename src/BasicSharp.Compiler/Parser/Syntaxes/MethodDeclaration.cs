@@ -23,7 +23,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             yield return ReturnType;
             yield return Identifier;
             if (ParameterList != null)
-                foreach (var item in ParameterList.GetInternalTokens())
+                foreach (var item in ParameterList.Tokens)
                     yield return item;
         }
     }

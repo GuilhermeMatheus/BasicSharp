@@ -20,7 +20,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             yield return Modifier;
 
             if (Declarator != null)
-                foreach (var item in Declarator.GetInternalTokens())
+                foreach (var item in Declarator.Tokens)
                     yield return item;
             
             yield return SemiColon;
