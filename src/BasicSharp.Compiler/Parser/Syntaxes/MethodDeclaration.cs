@@ -7,8 +7,22 @@ using System.Threading.Tasks;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
-    public class MethodDeclaration : SyntaxNode
+    public class MethodDeclaration : ModuleMemberDeclaration
     {
+        public string Name
+        {
+            get { return Identifier.StringValue; }
+        }
+        public int Arity
+        {
+            get { return ParameterList.Parameters.Count; }
+        }
+        public override bool IsPublic
+        {
+            get { return Modifier.Kind == SyntaxKind.EverybodyKeyword; }
+        }
+
+
         public TokenInfo Modifier { get; internal set; }
         public TokenInfo ReturnType { get; internal set; }
         public TokenInfo Identifier { get; internal set; }
@@ -22,8 +36,13 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             yield return Modifier;
             yield return ReturnType;
             yield return Identifier;
+
             if (ParameterList != null)
                 foreach (var item in ParameterList.Tokens)
+                    yield return item;
+
+            if (Block != null)
+                foreach (var item in Block.Tokens)
                     yield return item;
         }
     }

@@ -45,5 +45,14 @@ namespace BasicSharp.Compiler.Parser.Extensions
                     return false;
             }
         }
+
+        public static bool IsIn(this SyntaxKind syntaxKind, params SyntaxKind[] expecteds)
+        {
+            foreach (var item in expecteds)
+                if (syntaxKind.Equals(item))
+                    return true;
+
+            return false;
+        }
     }
 }

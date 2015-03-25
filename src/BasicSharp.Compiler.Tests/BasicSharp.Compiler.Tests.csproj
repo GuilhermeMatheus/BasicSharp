@@ -65,6 +65,7 @@
     <Compile Include="Lexer\NumericLiteralTest.cs" />
     <Compile Include="Lexer\StringLiteralTest.cs" />
     <Compile Include="Lexer\BooleanTest.cs" />
+    <Compile Include="Parser\CompilationUnitTest.cs" />
     <Compile Include="Parser\FieldAndMethodTest.cs" />
     <Compile Include="SlidingText\PeekTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

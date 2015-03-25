@@ -28,6 +28,9 @@ namespace BasicSharp.Compiler.Parser
             enumerator.MoveNext();
             SyntaxNode root;
 
+            if ((root = getCompilationUnit()) != null)
+                return root;
+
             if ((root = getFieldOrMethodDeclaration()) != null)
                 return root;
 
@@ -35,7 +38,101 @@ namespace BasicSharp.Compiler.Parser
         }
 
         #region Syntax Reduces
-        SyntaxNode getFieldOrMethodDeclaration()
+
+        #region CompilerUnit
+        CompilationUnit getCompilationUnit()
+        {
+            var hasImplementsDirective = false;
+            var result = new CompilationUnit();
+
+            ImplementsDirective currImplDir;
+            while ((currImplDir = getImplementsDirective()) != null) {
+                hasImplementsDirective = true;
+                result.AddImplementsDirective(currImplDir);
+                dumpTriviaBufferInto(result);
+            }
+
+            if (!hasImplementsDirective)
+                return null;
+
+            var module = getModuleDeclaration();
+            dumpTriviaBufferInto(result);
+
+            if (module == null)
+                throw null;
+
+            result.Module = module;
+
+            return result;
+        }
+
+        ImplementsDirective getImplementsDirective()
+        {
+            var implements = currentToken();
+            
+            if (implements.Kind != SyntaxKind.ImplementsDirectiveKeyword)
+                return null;
+
+            var result = new ImplementsDirective { ImplementsToken = implements };
+
+            while (consumeCurrentTokenAndGetNext().Kind.IsIn(SyntaxKind.Identifier, SyntaxKind.DotToken))
+                result.AddFullClassNamePart(currentToken());
+
+            if (currentToken().Kind != SyntaxKind.SemicolonToken)
+                throw null;
+
+            result.Semicolon = currentToken();
+            consumeCurrentTokenAndGetNext();
+            dumpTriviaBufferInto(result);
+            
+            return result;
+        }
+        ModuleDeclaration getModuleDeclaration()
+        {
+            var module = currentToken();
+            if (module.Kind != SyntaxKind.ModuleKeyword)
+                return null;
+
+            var result = new ModuleDeclaration { ModuleToken = module };
+
+            var name = consumeCurrentTokenAndGetNext();
+            if (name.Kind != SyntaxKind.Identifier)
+                throw null;
+
+            dumpTriviaBufferInto(result);
+            result.Name = name;
+
+            dumpTriviaBufferInto(result);
+            
+            var openBrace = consumeCurrentTokenAndGetNext();
+            if (openBrace.Kind != SyntaxKind.OpenBraceToken)
+                throw null;
+
+            result.OpenBrace = openBrace;
+            consumeCurrentTokenAndGetNext();
+            
+            dumpTriviaBufferInto(result);
+
+            ModuleMemberDeclaration member;
+            while ((member = getFieldOrMethodDeclaration()) != null) {
+                result.AddMember(member);
+                dumpTriviaBufferInto(result);
+            }
+
+            var closeBrace = consumeCurrentTokenAndGetNext();
+            if (closeBrace.Kind != SyntaxKind.CloseBraceToken)
+                throw null;
+
+            result.CloseBrace = closeBrace;
+            consumeCurrentTokenAndGetNext();
+            
+            return result;
+        }
+        
+        #endregion
+
+        #region FieldOrMethodDeclaration
+        ModuleMemberDeclaration getFieldOrMethodDeclaration()
         {
             var modifier = currentToken();
             if (!modifier.Kind.IsModifier())
@@ -70,10 +167,13 @@ namespace BasicSharp.Compiler.Parser
 
             var variableDeclaration = VariableDeclaration.WithDeclarator(getVariableDeclarator(identifier));
             variableDeclaration.Type = type;
+            result.Declaration = variableDeclaration;
 
             var current = currentToken();
             if (current.Kind == SyntaxKind.SemicolonToken) {
-                result.SemiColon = consumeCurrentTokenAndGetNext();
+                dumpTriviaBufferInto(variableDeclaration);
+                consumeCurrentTokenAndGetNext();
+                result.Semicolon = current;
                 return result;
             }
 
@@ -81,45 +181,52 @@ namespace BasicSharp.Compiler.Parser
             if (current.Kind != SyntaxKind.CommaToken)
                 throw null;
 
+            variableDeclaration.AddTrivia(currentToken());
+            consumeCurrentTokenAndGetNext();
             VariableDeclarator varDecl;
-            while ((varDecl = getVariableDeclarator()) != null) {
+            while ((varDecl = getVariableDeclarator()) != null)
+            {
                 dumpTriviaBufferInto(variableDeclaration);
                 variableDeclaration.AddDeclarator(varDecl);
+
+                if (currentToken().Kind == SyntaxKind.CommaToken)
+                {
+                    variableDeclaration.AddTrivia(currentToken());
+                    consumeCurrentTokenAndGetNext();
+                }
             }
 
-            current = consumeCurrentTokenAndGetNext();
-            if (current.Kind != SyntaxKind.SemicolonToken)
+            if (currentToken().Kind != SyntaxKind.SemicolonToken)
                 throw null;
 
-            result.SemiColon = current;
+            result.Semicolon = currentToken();
 
+            consumeCurrentTokenAndGetNext();
             return result;
-        }
-        VariableDeclaration getVariableDeclaration()
-        {
-            throw new NotImplementedException();
         }
         VariableDeclarator getVariableDeclarator()
         {
             var current = currentToken();
-            if (current.Kind == SyntaxKind.Identifier)
-                return getVariableDeclarator(current);
+            
+            if (current.Kind != SyntaxKind.Identifier)
+                return null;
 
-            return null;
+            consumeCurrentTokenAndGetNext();
+            return getVariableDeclarator(current);
         }
         VariableDeclarator getVariableDeclarator(TokenInfo identifier)
         {
             var current = currentToken();
 
-            if (current.Kind == SyntaxKind.CommaToken)
+            if (current.Kind.IsIn(SyntaxKind.CommaToken, SyntaxKind.SemicolonToken))
                 return new VariableDeclarator { Identifier = identifier };
 
-            if (current.Kind == SyntaxKind.EqualsToken)
-                return new VariableDeclarator { Identifier = identifier, Assignment = getAssignmentExpression() };
+            if (current.Kind == SyntaxKind.EqualsToken) 
+                return new VariableDeclarator { Identifier = identifier, Assignment = getAssignmentExpression(current) };
 
             throw null;
         }
-        AssignmentExpression getAssignmentExpression()
+        AssignmentExpression getAssignmentExpression(TokenInfo assignmentOperatorInfo)
         {
             throw new NotImplementedException();
         }
@@ -153,6 +260,7 @@ namespace BasicSharp.Compiler.Parser
             dumpTriviaBufferInto(result);
             result.CloseParenToken = closeParen;
 
+            consumeCurrentTokenAndGetNext();
             return result;
         }
         Parameter getParameter()
@@ -178,9 +286,19 @@ namespace BasicSharp.Compiler.Parser
         }
         Block getBlock()
         {
-            return new Block();
-            throw new NotImplementedException();
+            var openBrace = currentToken();
+            if (openBrace.Kind != SyntaxKind.OpenBraceToken)
+                return null;
+
+            TokenInfo closeBrace;
+            while ((closeBrace = consumeCurrentTokenAndGetNext()).Kind != SyntaxKind.CloseBraceToken) { }
+
+            consumeCurrentTokenAndGetNext();
+            return new Block { OpenBrace = openBrace, CloseBrace = closeBrace };
         }
+        #endregion
+
+
         #endregion
 
         void dumpTriviaBufferInto(SyntaxNode node)
@@ -190,6 +308,9 @@ namespace BasicSharp.Compiler.Parser
         }
         TokenInfo currentToken()
         {
+            if (enumerator.Current.Kind.IsTrivia())
+                return consumeCurrentTokenAndGetNext();
+
             return enumerator.Current;
         }
         TokenInfo consumeCurrentTokenAndGetNext()
