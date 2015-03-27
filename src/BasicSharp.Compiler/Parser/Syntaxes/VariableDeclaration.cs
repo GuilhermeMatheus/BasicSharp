@@ -5,38 +5,45 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BasicSharp.Compiler.Parser.Extensions;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
-    public class VariableDeclaration : SyntaxNode
+    public static class VariableDeclaration
     {
-        List<VariableDeclarator> declarators = new List<VariableDeclarator>();
-
-        public TokenInfo Type { get; set; }
-        public ReadOnlyCollection<VariableDeclarator> Declarators
+        public static VariableDeclaration<TD> WithDeclarator<TD>(VariableDeclarator<TD> declarator)
+            where TD : AssignmentExpression
         {
-            get { return new ReadOnlyCollection<VariableDeclarator>(declarators); }
-        }
-
-        public void  AddDeclarator(VariableDeclarator declarator)
-        {
-            this.declarators.Add(declarator);
-        }
-
-        public static VariableDeclaration WithDeclarator(VariableDeclarator declarator)
-        {
-            var result = new VariableDeclaration();
+            var result = new VariableDeclaration<TD>();
             result.AddDeclarator(declarator);
 
             return result;
         }
+    }
+
+    public class VariableDeclaration<T> : SyntaxNode 
+        where T : AssignmentExpression
+    {
+        List<VariableDeclarator<T>> declarators = new List<VariableDeclarator<T>>();
+
+        public PredefinedType Type { get; internal set; }
+        public ReadOnlyCollection<VariableDeclarator<T>> Declarators
+        {
+            get { return new ReadOnlyCollection<VariableDeclarator<T>>(declarators); }
+        }
+
+        public void AddDeclarator(VariableDeclarator<T> declarator)
+        {
+            this.declarators.Add(declarator);
+        }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()
         {
-            yield return Type;
+            foreach (var item in Type.GetTokenEnumerable())
+                yield return item;
 
             foreach (var decl in declarators)
-                foreach (var item in decl.Tokens)
+                foreach (var item in decl.GetTokenEnumerable())
                     yield return item;
         }
     }

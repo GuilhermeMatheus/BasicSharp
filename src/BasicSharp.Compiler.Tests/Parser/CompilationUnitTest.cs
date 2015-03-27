@@ -19,7 +19,7 @@ namespace BasicSharp.Compiler.Tests.Parser
 
                            module m
                            {
-                               my int a, b, c;
+                               my int[] a, b, c;
                                my string s;
 
                                everybody void Main()

@@ -48,6 +48,18 @@
     <Compile Include="Lexer\SyntacticException.cs" />
     <Compile Include="Lexer\Token\SyntaxKind.cs" />
     <Compile Include="Lexer\Token\TokenInfo.cs" />
+    <Compile Include="Parser\Syntaxes\AccessorExpression.cs" />
+    <Compile Include="Parser\Syntaxes\Argument.cs" />
+    <Compile Include="Parser\Syntaxes\ArgumentList.cs" />
+    <Compile Include="Parser\Syntaxes\ArrayRankSpecifier.cs" />
+    <Compile Include="Parser\Syntaxes\BinaryExpression.cs" />
+    <Compile Include="Parser\Syntaxes\ConstantAssignmentExpression.cs" />
+    <Compile Include="Parser\Syntaxes\Expression.cs" />
+    <Compile Include="Parser\Extensions\SyntaxNodeExtensions.cs" />
+    <Compile Include="Parser\Syntaxes\InvocationExpression.cs" />
+    <Compile Include="Parser\Syntaxes\LocalVariableDeclaration.cs" />
+    <Compile Include="Parser\Syntaxes\ParenthesedExpression.cs" />
+    <Compile Include="Parser\Syntaxes\PredefinedType.cs" />
     <Compile Include="Parser\Syntaxes\CompilationUnit.cs" />
     <Compile Include="Parser\Extensions\SyntaxKindExtensions.cs" />
     <Compile Include="Parser\Factories\ParserFactory.cs" />
@@ -64,6 +76,7 @@
     <Compile Include="Parser\Syntaxes\SyntaxNode.cs" />
     <Compile Include="Parser\Syntaxes\VariableDeclaration.cs" />
     <Compile Include="Parser\Syntaxes\VariableDeclarator.cs" />
+    <Compile Include="Parser\Syntaxes\UnaryExpression.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -72,7 +85,6 @@
       <Name>BasicSharp.Utils</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using BasicSharp.Compiler.Parser;
 using System.Collections.ObjectModel;
+using BasicSharp.Compiler.Parser.Extensions;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
@@ -33,7 +34,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             yield return OpenBrace;
 
             foreach (var m in members)
-                foreach (var item in m.Tokens)
+                foreach (var item in m.GetTokenEnumerable())
                     yield return item;
             
             yield return CloseBrace;

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BasicSharp.Compiler.Parser.Extensions;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
@@ -16,7 +17,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 
         public TokenInfo Modifier { get; internal set; }
 
-        public VariableDeclaration Declaration { get; internal set; }
+        public VariableDeclaration<ConstantAssignmentExpression> Declaration { get; internal set; }
 
         public TokenInfo Semicolon { get; internal set; }
 
@@ -24,9 +25,8 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
         {
             yield return Modifier;
 
-            if (Declaration != null)
-                foreach (var item in Declaration.Tokens)
-                    yield return item;
+            foreach (var item in Declaration.GetTokenEnumerable())
+                yield return item;
             
             yield return Semicolon;
         }

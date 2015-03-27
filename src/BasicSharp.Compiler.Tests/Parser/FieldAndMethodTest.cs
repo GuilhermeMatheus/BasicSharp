@@ -29,13 +29,13 @@ namespace BasicSharp.Compiler.Tests.Parser
         [TestMethod]
         public void AST_WhenReadingMultiFieldDeclaration()
         {
-            var source = "everybody int a, b, c, d    , e ,    f      ;";
+            var source = "everybody int[] a, b, c, d    , e ,    f      ;";
             var parser = ParserFactory.FromString(source);
             var result = parser.GetSyntax();
             var f = result as FieldDeclaration;
 
             result.Should().BeOfType<FieldDeclaration>();
-            f.Declaration.Type.Kind.Should().Be(SyntaxKind.IntKeyword, "because its a Integer field declaration");
+            f.Declaration.Type.TypeToken.Kind.Should().Be(SyntaxKind.IntKeyword, "because its a Integer field declaration");
             f.Declaration.Declarators.Count.Should().Be(6, "because it has 6 fields declarators");
             f.IsPublic.Should().BeTrue("because it's a public fields");
             f.ToString().Should().BeEquivalentTo(source, "because ToString() override must be concise");

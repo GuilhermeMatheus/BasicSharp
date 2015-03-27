@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
+using BasicSharp.Compiler.Parser.Extensions;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
@@ -31,7 +32,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             yield return OpenParenToken;
 
             foreach (var param in parameters)
-                foreach (var item in param.Tokens)
+                foreach (var item in param.GetTokenEnumerable())
                     yield return item;
 
             yield return CloseParenToken;

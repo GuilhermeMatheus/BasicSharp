@@ -7,16 +7,13 @@ using BasicSharp.Compiler.Parser.Extensions;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
-    public class VariableDeclarator<T> : SyntaxNode
-        where T : AssignmentExpression
+    public class Argument : SyntaxNode
     {
-        public TokenInfo Identifier { get; set; }
-        public T Assignment { get; set; }
+        public Expression Expression { get; internal set; }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()
         {
-            yield return Identifier;
-            foreach (var item in Assignment.GetTokenEnumerable())
+            foreach (var item in Expression.GetTokenEnumerable())
                 yield return item;
         }
     }

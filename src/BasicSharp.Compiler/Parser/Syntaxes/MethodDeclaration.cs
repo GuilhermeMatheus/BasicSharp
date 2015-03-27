@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BasicSharp.Compiler.Parser.Extensions;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
@@ -24,7 +25,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 
 
         public TokenInfo Modifier { get; internal set; }
-        public TokenInfo ReturnType { get; internal set; }
+        public PredefinedType ReturnType { get; internal set; }
         public TokenInfo Identifier { get; internal set; }
 
         public ParameterList ParameterList { get; internal set; }
@@ -34,16 +35,17 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
         public override IEnumerable<TokenInfo> GetInternalTokens()
         {
             yield return Modifier;
-            yield return ReturnType;
+
+            foreach (var item in ReturnType.GetTokenEnumerable())
+                yield return item;
+
             yield return Identifier;
 
-            if (ParameterList != null)
-                foreach (var item in ParameterList.Tokens)
-                    yield return item;
+            foreach (var item in ParameterList.GetTokenEnumerable())
+                yield return item;
 
-            if (Block != null)
-                foreach (var item in Block.Tokens)
-                    yield return item;
+            foreach (var item in Block.GetTokenEnumerable())
+                yield return item;
         }
     }
 }

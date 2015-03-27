@@ -54,5 +54,20 @@ namespace BasicSharp.Compiler.Parser.Extensions
 
             return false;
         }
+
+        public static bool IsOperator(this SyntaxKind syntaxKind)
+        {
+            switch (syntaxKind)
+            {
+                case SyntaxKind.PlusToken:
+                case SyntaxKind.MinusToken:
+                case SyntaxKind.AsteriskToken:
+                case SyntaxKind.SlashToken:
+                case SyntaxKind.ModToken:
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 }

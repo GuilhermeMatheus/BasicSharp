@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
-    public class AssignmentExpression : SyntaxNode
+    public class AssignmentExpression : Expression
     {
 
         public override IEnumerable<Lexer.TokenInfo> GetInternalTokens()
