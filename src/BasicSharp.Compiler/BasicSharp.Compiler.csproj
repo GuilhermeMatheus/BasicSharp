@@ -48,6 +48,8 @@
     <Compile Include="Lexer\SyntacticException.cs" />
     <Compile Include="Lexer\Token\SyntaxKind.cs" />
     <Compile Include="Lexer\Token\TokenInfo.cs" />
+    <Compile Include="Parser\Extensions\ExpressionExtensions.cs" />
+    <Compile Include="Parser\LiteralExpression.cs" />
     <Compile Include="Parser\Syntaxes\AccessorExpression.cs" />
     <Compile Include="Parser\Syntaxes\Argument.cs" />
     <Compile Include="Parser\Syntaxes\ArgumentList.cs" />

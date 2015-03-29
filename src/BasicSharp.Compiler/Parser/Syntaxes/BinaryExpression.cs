@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BasicSharp.Compiler.Parser.Extensions;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
@@ -15,7 +16,13 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 
         public override IEnumerable<TokenInfo> GetInternalTokens()
         {
-            throw new NotImplementedException();
+            foreach (var item in LeftSide.GetTokenEnumerable())
+                yield return item;
+
+            yield return OperatorToken;
+
+            foreach (var item in RightSide.GetTokenEnumerable())
+                yield return item;
         }
     }
 }

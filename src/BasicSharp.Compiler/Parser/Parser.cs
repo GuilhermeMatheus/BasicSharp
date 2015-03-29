@@ -34,6 +34,9 @@ namespace BasicSharp.Compiler.Parser
             if ((root = getFieldOrMethodDeclaration()) != null)
                 return root;
 
+            if ((root = getExpression()) != null)
+                return root;
+
             throw new NotImplementedException();
         }
 
@@ -357,11 +360,44 @@ namespace BasicSharp.Compiler.Parser
 
         #endregion
 
-        //TODO: Continue from here, think about LiteralExpression
         #region Expressions
+
         Expression getExpression()
         {
+            Expression root;
+
+            if ((root = getMathBinaryExpression()) != null)
+                return root;
+
             return new ConstantAssignmentExpression();
+        }
+
+        BinaryExpression getMathBinaryExpression()
+        {
+            Expression root = getUnaryExpression();
+
+            if (root == null)
+                return null;
+
+            Expression aux = null;
+            while(true)
+            {
+                if ((aux = getAdditiveExpression(root)) != root)
+                    root = aux;
+                else if ((aux = getMultiplicativeExpression(root)) != root)
+                    root = aux;
+                else if ((aux = getModExpression(root)) != root)
+                    root = aux;
+                else
+                    break;
+            }
+
+            return (BinaryExpression)root;
+        }
+
+        Expression getUnaryExpression()
+        {
+            return getLiteralExpression() ?? getInvocationOrAccessorExpression() ?? getSignedUnaryExpression();
         }
 
         ParenthesedExpression getParenthesedExpression()
@@ -428,54 +464,101 @@ namespace BasicSharp.Compiler.Parser
             return result;
         }
 
-        Expression getAdditiveExpression()
+        Expression getAdditiveExpression(Expression leftSide)
         {
-            return getUnaryOrBinary(getMultiplicativeExpression, SyntaxKind.PlusToken, SyntaxKind.MinusToken);
-        }
-
-        Expression getMultiplicativeExpression()
-        {
-            return getUnaryOrBinary(getModExpression, SyntaxKind.AsteriskToken, SyntaxKind.SlashToken);
-        }
-
-        Expression getModExpression()
-        {
-            return getUnaryOrBinary(getUnaryExpression, SyntaxKind.ModToken);
-        }
-
-        Expression getUnaryExpression()
-        {
-            var signal = currentToken();
-            if (!signal.Kind.IsIn(SyntaxKind.MinusToken, SyntaxKind.PlusToken))
-                return getExpression();
-
-            return new UnaryExpression { SignalToken = signal, Expression = getExpression() };
-        }
-
-        Expression getUnaryOrBinary(Func<Expression> precedence, params SyntaxKind[] operators)
-        {
-            var leftSide = getExpression();
-            if (leftSide == null)
-                return null;
+            leftSide = leftSide ?? getUnaryExpression();
 
             dumpTriviaBufferInto(leftSide);
 
-            var _operator = consumeCurrentTokenAndGetNext();
-            if (!_operator.Kind.IsIn(operators))
+            var op = currentToken();
+
+            if (!op.Kind.IsIn(SyntaxKind.PlusToken, SyntaxKind.MinusToken))
                 return leftSide;
 
-            var rightSide = precedence();
-            if (rightSide == null)
-                throw null;
+            consumeCurrentTokenAndGetNext();
 
-            dumpTriviaBufferInto(rightSide);
+            var rightSide = getModExpression(null); // getMultiplicativeExpression(null);
 
             return new BinaryExpression
             {
                 LeftSide = leftSide,
-                OperatorToken = _operator,
+                OperatorToken = op,
                 RightSide = rightSide
             };
+        }
+
+        Expression getMultiplicativeExpression(Expression leftSide)
+        {
+            leftSide = leftSide ?? getAdditiveExpression(null);
+
+            dumpTriviaBufferInto(leftSide);
+
+            var op = currentToken();
+
+            if (!op.Kind.IsIn(SyntaxKind.AsteriskToken, SyntaxKind.SlashToken))
+                return leftSide;
+
+            consumeCurrentTokenAndGetNext();
+
+            var rightSide = getModExpression(null);
+
+            return new BinaryExpression
+            {
+                LeftSide = leftSide,
+                OperatorToken = op,
+                RightSide = rightSide
+            };
+        }
+
+        Expression getModExpression(Expression leftSide)
+        {
+            leftSide = leftSide ?? getMultiplicativeExpression(null);
+
+            dumpTriviaBufferInto(leftSide);
+
+            var op = currentToken();
+
+            if (!op.Kind.IsIn(SyntaxKind.ModToken))
+                return leftSide;
+
+            consumeCurrentTokenAndGetNext();
+
+            var rightSide = getUnaryExpression();
+
+            return new BinaryExpression
+            {
+                LeftSide = leftSide,
+                OperatorToken = op,
+                RightSide = rightSide
+            };
+        }
+
+        Expression getSignedUnaryExpression()
+        {
+            var signal = currentToken();
+            
+            if (signal.Kind.IsIn(SyntaxKind.MinusToken, SyntaxKind.PlusToken))
+            {
+                consumeCurrentTokenAndGetNext();
+                return new UnaryExpression { SignalToken = signal, Expression = getExpression() };
+            }
+
+            return getLiteralExpression() ?? getInvocationOrAccessorExpression() ?? getParenthesedExpression() as Expression;
+        }
+
+        LiteralExpression getLiteralExpression()
+        {
+            var value = currentToken();
+
+            if (!value.Kind.IsLiteral())
+                return null;
+
+            consumeCurrentTokenAndGetNext();
+
+            var result = new LiteralExpression { Value = value };
+            dumpTriviaBufferInto(result);
+            
+            return result;
         }
         #endregion
 

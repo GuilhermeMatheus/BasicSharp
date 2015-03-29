@@ -181,6 +181,7 @@ namespace BasicSharp.Compiler.Lexer
 
         }
         
+        //UNDONE: Logical Operators arent recognized
         TokenInfo scanAssignmentOrRelationalOperator()
         {
             var ret = new TokenInfo { Begin = text.Offset, Kind = SyntaxKind.None };

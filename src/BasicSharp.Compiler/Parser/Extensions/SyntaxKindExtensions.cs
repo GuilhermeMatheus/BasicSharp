@@ -69,5 +69,20 @@ namespace BasicSharp.Compiler.Parser.Extensions
                     return false;
             }
         }
+    
+        public static bool IsLiteral(this SyntaxKind syntaxKind)
+        {
+            switch (syntaxKind)
+            {
+                case SyntaxKind.ByteLiteral:
+                case SyntaxKind.CharLiteral:
+                case SyntaxKind.DoubleLiteral:
+                case SyntaxKind.IntegerLiteral:
+                case SyntaxKind.StringLiteral:
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 }
