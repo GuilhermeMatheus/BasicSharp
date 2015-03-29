@@ -21,7 +21,15 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 
         public ReadOnlyCollection<TokenInfo> Tokens
         {
-            get { return new ReadOnlyCollection<TokenInfo>(Trivias.Concat(GetInternalTokens()).OrderBy(x => x.Begin).ToList()); }
+            get
+            {
+                var source = from item in Trivias.Concat(GetInternalTokens())
+                             where item != null
+                             orderby item.Begin
+                             select item;
+
+                return source.ToList().AsReadOnly();
+            }
         }
 
         public void AddTrivia(TokenInfo trivia)
