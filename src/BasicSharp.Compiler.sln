@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Compiler", "Compiler", "{93
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicSharp.Utils", "BasicSharp.Utils\BasicSharp.Utils.csproj", "{15C4FDB5-7ED4-48C4-9D26-DDA3E9B1C7B0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicSharp.IDE", "BasicSharp.IDE\BasicSharp.IDE.csproj", "{89B7544D-75B5-40DA-A8A0-51DB3726A720}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{15C4FDB5-7ED4-48C4-9D26-DDA3E9B1C7B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{15C4FDB5-7ED4-48C4-9D26-DDA3E9B1C7B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{15C4FDB5-7ED4-48C4-9D26-DDA3E9B1C7B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89B7544D-75B5-40DA-A8A0-51DB3726A720}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89B7544D-75B5-40DA-A8A0-51DB3726A720}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89B7544D-75B5-40DA-A8A0-51DB3726A720}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89B7544D-75B5-40DA-A8A0-51DB3726A720}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -37,5 +43,6 @@ Global
 		{1BB83B5F-9E74-4E81-B09C-AD000DED523E} = {93E1D6F6-FD9F-440C-A0EC-302B20F09347}
 		{EFFF8632-24AB-4164-BE39-8263B1AEC1FE} = {93E1D6F6-FD9F-440C-A0EC-302B20F09347}
 		{15C4FDB5-7ED4-48C4-9D26-DDA3E9B1C7B0} = {93E1D6F6-FD9F-440C-A0EC-302B20F09347}
+		{89B7544D-75B5-40DA-A8A0-51DB3726A720} = {93E1D6F6-FD9F-440C-A0EC-302B20F09347}
 	EndGlobalSection
 EndGlobal

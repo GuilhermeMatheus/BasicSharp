@@ -13,7 +13,7 @@ namespace BasicSharp.Compiler.Tests.Parser
     public class MathExpressionsTest
     {
         [TestMethod]
-        public void AST_WhenReadingMultiplicativeAndAdditive_ShouldReturnTheCorrectAST()
+        public void GetSyntax_WithMultiplicativeAndAdditive_ShouldReturnTheCorrectAST()
         {
             var source = "1*2+3";
             var parser = ParserFactory.FromString(source);
@@ -37,7 +37,7 @@ namespace BasicSharp.Compiler.Tests.Parser
         }
 
         [TestMethod]
-        public void AST_WhenReadingAdditiveAndMultiplicative_ShouldReturnTheCorrectAST()
+        public void GetSyntax_WithAdditiveAndMultiplicative_ShouldReturnTheCorrectAST()
         {
             var source = "1+2*3";
             var parser = ParserFactory.FromString(source);
@@ -61,7 +61,7 @@ namespace BasicSharp.Compiler.Tests.Parser
         }
 
         [TestMethod]
-        public void AST_ComplexMathExpression_Evalutating()
+        public void GetSyntax_WithComplexMathExpression_Evaluating()
         {
             var source = "1 + (2 + 3) % 5 - 2 * 10 \\ 2";
             var parser = ParserFactory.FromString(source);
@@ -73,6 +73,14 @@ namespace BasicSharp.Compiler.Tests.Parser
             result.ShouldBeEquivalentTo(expected);
         }
 
+        [TestMethod]
+        public void GetSyntax_WithMembersArithmeticManipulation_ShouldReturnTheCorrectAST()
+        {
+            var source = "getRandom(0.0, 1.0) + sqrt(n) - m + 2";
+            var parser = ParserFactory.FromString(source);
+            var b = parser.GetSyntax() as BinaryExpression;
 
+            b.ToString();
+        }
     }
 }

@@ -357,22 +357,20 @@ namespace BasicSharp.Compiler.Parser
 
 
         }
-
         #endregion
 
         #region Expressions
-
         Expression getExpression()
         {
             Expression root;
 
-            if ((root = getMathBinaryExpression()) != null)
+            if ((root = getArithmeticBinaryExpression()) != null)
                 return root;
 
             return new ConstantAssignmentExpression();
         }
 
-        BinaryExpression getMathBinaryExpression()
+        Expression getArithmeticBinaryExpression()
         {
             Expression root = getUnaryExpression();
 
@@ -392,7 +390,7 @@ namespace BasicSharp.Compiler.Parser
                     break;
             }
 
-            return (BinaryExpression)root;
+            return root;
         }
 
         Expression getUnaryExpression()
@@ -435,6 +433,8 @@ namespace BasicSharp.Compiler.Parser
             if (openParen.Kind != SyntaxKind.OpenParenToken)
                 return new AccessorExpression { Identifier = identifier };
 
+            consumeCurrentTokenAndGetNext();
+
             var result = new InvocationExpression { MethodName = identifier };
             dumpTriviaBufferInto(result);
 
@@ -442,7 +442,7 @@ namespace BasicSharp.Compiler.Parser
             result.Arguments = arguments;
 
             TokenInfo c;
-            while ((c = consumeCurrentTokenAndGetNext()).Kind != SyntaxKind.CloseParenToken)
+            while ((c = currentToken()).Kind != SyntaxKind.CloseParenToken)
             {
                 dumpTriviaBufferInto(arguments);
 
@@ -461,6 +461,8 @@ namespace BasicSharp.Compiler.Parser
             arguments.CloseParen = currentToken();
             dumpTriviaBufferInto(arguments);
 
+            consumeCurrentTokenAndGetNext();
+
             return result;
         }
 
@@ -477,7 +479,7 @@ namespace BasicSharp.Compiler.Parser
 
             consumeCurrentTokenAndGetNext();
 
-            var rightSide = getModExpression(null); // getMultiplicativeExpression(null);
+            var rightSide = getModExpression(null);
 
             return new BinaryExpression
             {
