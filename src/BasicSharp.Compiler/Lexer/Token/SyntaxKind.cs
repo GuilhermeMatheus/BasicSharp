@@ -60,6 +60,9 @@ namespace BasicSharp.Compiler.Lexer
         ElseKeyword,
         TrueKeyword,
         FalseKeyword,
+        
+        OrOperator,
+        AndOperator,
 
         WhileKeyword,
         ForKeyword,
@@ -74,6 +77,6 @@ namespace BasicSharp.Compiler.Lexer
         EndOfLineTrivia,
         WhitespaceTrivia,
         TabTrivia,
-        SingleLineCommentTrivia,
+        SingleLineCommentTrivia
     }
 }

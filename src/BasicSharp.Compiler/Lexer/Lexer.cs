@@ -124,6 +124,8 @@ namespace BasicSharp.Compiler.Lexer
                     case '-':
                     case '*':
                     case '\\':
+                    case '|':
+                    case '&':
                         yield return scanAssignmentOrRelationalOperator();
                         continue;
                     case '[':
@@ -217,6 +219,10 @@ namespace BasicSharp.Compiler.Lexer
                 ret.Kind = SyntaxKind.SlashEqualsToken;
             else if (text.AdvanceIfMatches(stringValue = "\\"))
                 ret.Kind = SyntaxKind.SlashToken;
+            else if (text.AdvanceIfMatches(stringValue = "|"))
+                ret.Kind = SyntaxKind.OrOperator;
+            else if (text.AdvanceIfMatches(stringValue = "&"))
+                ret.Kind = SyntaxKind.AndOperator;
 
             if (ret.Kind == SyntaxKind.None)
                 return null;
