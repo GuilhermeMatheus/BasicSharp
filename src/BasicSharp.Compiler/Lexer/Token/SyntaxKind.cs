@@ -22,14 +22,16 @@ namespace BasicSharp.Compiler.Lexer
         SemicolonToken,
         CommaToken,
 
+        OrOperator,
+        AndOperator,
+        EqualsEqualsOperator,
+        MinorOperator,
+        MinorEqualsOperator,
+        MajorOperator,
+        MajorEqualsOperator,
+        
+        ModOperator,
         EqualsToken,
-        EqualsEqualsToken,
-        MinorToken,
-        MinorEqualsToken,
-        MajorToken,
-        MajorEqualsToken,
-        ModToken,
-
         PlusEqualsToken,
         PlusToken,
         MinusEqualsToken,
@@ -61,9 +63,6 @@ namespace BasicSharp.Compiler.Lexer
         TrueKeyword,
         FalseKeyword,
         
-        OrOperator,
-        AndOperator,
-
         WhileKeyword,
         ForKeyword,
         BreakKeyword,

@@ -24,7 +24,7 @@ namespace BasicSharp.Compiler.Parser.Extensions
                         return binary.LeftSide.EvaluateTreeValueAsInt() * binary.RightSide.EvaluateTreeValueAsInt();
                     case SyntaxKind.SlashToken:
                         return binary.LeftSide.EvaluateTreeValueAsInt() / binary.RightSide.EvaluateTreeValueAsInt();
-                    case SyntaxKind.ModToken:
+                    case SyntaxKind.ModOperator:
                         return binary.LeftSide.EvaluateTreeValueAsInt() % binary.RightSide.EvaluateTreeValueAsInt();
                     default:
                         throw new NotImplementedException();
@@ -37,6 +37,12 @@ namespace BasicSharp.Compiler.Parser.Extensions
             var parenthesed = expression as ParenthesedExpression;
             if (parenthesed != null)
                 return parenthesed.InnerExpression.EvaluateTreeValueAsInt();
+
+            var unary = expression as UnaryExpression;
+            if (unary != null)
+                return unary.SignalToken.Kind == 
+                    SyntaxKind.PlusToken ? unary.Expression.EvaluateTreeValueAsInt() :
+                                          -unary.Expression.EvaluateTreeValueAsInt();
 
             throw new NotImplementedException();
         }

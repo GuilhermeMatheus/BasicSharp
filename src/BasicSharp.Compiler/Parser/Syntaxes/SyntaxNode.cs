@@ -1,5 +1,6 @@
 ﻿using BasicSharp.Compiler.Lexer;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -9,8 +10,8 @@ using System.Threading.Tasks;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
-    [DebuggerDisplay("{ToString()}")]
-    public abstract class SyntaxNode
+    [DebuggerDisplay("{AsString()}")]
+    public abstract class SyntaxNode : ISyntaxTreeNode
     {
         List<TokenInfo> trivias = new List<TokenInfo>();
 
@@ -37,9 +38,10 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             trivias.Add(trivia);
         }
 
+        public abstract IEnumerable GetChilds();
         public abstract IEnumerable<TokenInfo> GetInternalTokens();
 
-        public override string ToString()
+        public string AsString()
         {
             var result = string.Empty;
 
@@ -47,6 +49,14 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
                 result += item.StringValue;
 
             return result;
+        }
+
+        public IEnumerable Childs
+        {
+            get
+            {
+                return GetChilds();
+            }
         }
     }
 }

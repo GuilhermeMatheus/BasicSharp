@@ -1,5 +1,6 @@
 ﻿using BasicSharp.Compiler.Lexer;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
         {
             get { return fullClassNameTokens.AsReadOnly(); }
         }
-        public TokenInfo Semicolon { get; internal set; }
+        public TokenInfo SemicolonToken { get; internal set; }
 
         public void AddFullClassNamePart(TokenInfo part)
         {
@@ -30,8 +31,17 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             foreach (var item in fullClassNameTokens)
                 yield return item;
             
-            yield return Semicolon;
+            yield return SemicolonToken;
         }
 
+        public override IEnumerable GetChilds()
+        {
+            yield return ImplementsToken;
+
+            foreach (var item in FullClassNameTokens)
+                yield return item;
+
+            yield return SemicolonToken;
+        }
     }
 }

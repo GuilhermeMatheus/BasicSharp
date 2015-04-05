@@ -17,9 +17,9 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 
         public TokenInfo Modifier { get; internal set; }
 
-        public VariableDeclaration<ConstantAssignmentExpression> Declaration { get; internal set; }
+        public VariableDeclaration Declaration { get; internal set; }
 
-        public TokenInfo Semicolon { get; internal set; }
+        public TokenInfo SemicolonToken { get; internal set; }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()
         {
@@ -28,7 +28,16 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             foreach (var item in Declaration.GetTokenEnumerable())
                 yield return item;
             
-            yield return Semicolon;
+            yield return SemicolonToken;
+        }
+
+        public override System.Collections.IEnumerable GetChilds()
+        {
+            yield return Modifier;
+
+            yield return Declaration;
+
+            yield return SemicolonToken;
         }
     }
 }

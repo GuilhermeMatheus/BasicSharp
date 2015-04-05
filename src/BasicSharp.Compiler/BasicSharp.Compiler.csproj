@@ -48,19 +48,25 @@
     <Compile Include="Lexer\SyntacticException.cs" />
     <Compile Include="Lexer\Token\SyntaxKind.cs" />
     <Compile Include="Lexer\Token\TokenInfo.cs" />
+    <Compile Include="Parser\Syntaxes\Statements\MethodInvocationStatement.cs" />
+    <Compile Include="Parser\Syntaxes\Statements\BreakStatement.cs" />
     <Compile Include="Parser\Extensions\ExpressionExtensions.cs" />
-    <Compile Include="Parser\LiteralExpression.cs" />
-    <Compile Include="Parser\Syntaxes\AccessorExpression.cs" />
+    <Compile Include="Parser\Syntaxes\Statements\ForStatement.cs" />
+    <Compile Include="Parser\Syntaxes\Statements\IfStatement.cs" />
+    <Compile Include="Parser\Syntaxes\Expressions\LiteralExpression.cs" />
+    <Compile Include="Parser\Syntaxes\Statements\ReturnStatement.cs" />
+    <Compile Include="Parser\Syntaxes\Statements\Statement.cs" />
+    <Compile Include="Parser\Syntaxes\Expressions\AccessorExpression.cs" />
     <Compile Include="Parser\Syntaxes\Argument.cs" />
     <Compile Include="Parser\Syntaxes\ArgumentList.cs" />
     <Compile Include="Parser\Syntaxes\ArrayRankSpecifier.cs" />
-    <Compile Include="Parser\Syntaxes\BinaryExpression.cs" />
-    <Compile Include="Parser\Syntaxes\ConstantAssignmentExpression.cs" />
-    <Compile Include="Parser\Syntaxes\Expression.cs" />
+    <Compile Include="Parser\Syntaxes\Expressions\BinaryExpression.cs" />
+    <Compile Include="Parser\Syntaxes\Expressions\Expression.cs" />
     <Compile Include="Parser\Extensions\SyntaxNodeExtensions.cs" />
-    <Compile Include="Parser\Syntaxes\InvocationExpression.cs" />
+    <Compile Include="Parser\Syntaxes\Expressions\MethodInvocationExpression.cs" />
+    <Compile Include="Parser\Syntaxes\ISyntaxTreeNode.cs" />
     <Compile Include="Parser\Syntaxes\LocalVariableDeclaration.cs" />
-    <Compile Include="Parser\Syntaxes\ParenthesedExpression.cs" />
+    <Compile Include="Parser\Syntaxes\Expressions\ParenthesedExpression.cs" />
     <Compile Include="Parser\Syntaxes\PredefinedType.cs" />
     <Compile Include="Parser\Syntaxes\CompilationUnit.cs" />
     <Compile Include="Parser\Extensions\SyntaxKindExtensions.cs" />
@@ -68,9 +74,9 @@
     <Compile Include="Parser\Syntaxes\ImplementsDirective.cs" />
     <Compile Include="Parser\Syntaxes\ModuleDeclaration.cs" />
     <Compile Include="Parser\Syntaxes\ModuleMemberDeclaration.cs" />
-    <Compile Include="Parser\Syntaxes\AssignmentExpression.cs" />
+    <Compile Include="Parser\Syntaxes\Expressions\AssignmentExpression.cs" />
     <Compile Include="Parser\Parser.cs" />
-    <Compile Include="Parser\Syntaxes\Block.cs" />
+    <Compile Include="Parser\Syntaxes\Statements\BlockStatement.cs" />
     <Compile Include="Parser\Syntaxes\FieldDeclaration.cs" />
     <Compile Include="Parser\Syntaxes\MethodDeclaration.cs" />
     <Compile Include="Parser\Syntaxes\Parameter.cs" />
@@ -78,7 +84,8 @@
     <Compile Include="Parser\Syntaxes\SyntaxNode.cs" />
     <Compile Include="Parser\Syntaxes\VariableDeclaration.cs" />
     <Compile Include="Parser\Syntaxes\VariableDeclarator.cs" />
-    <Compile Include="Parser\Syntaxes\UnaryExpression.cs" />
+    <Compile Include="Parser\Syntaxes\Expressions\UnaryExpression.cs" />
+    <Compile Include="Parser\Syntaxes\Statements\WhileStatement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

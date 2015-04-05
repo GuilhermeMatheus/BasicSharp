@@ -16,10 +16,15 @@ namespace BasicSharp.Compiler.Parser
         readonly IEnumerator<TokenInfo> enumerator;
         readonly Queue<TokenInfo> triviaBuffer;
 
-        public Parser(lxr.Lexer lexer)
+        public Parser(lxr.Lexer lexer) 
+            : this(lexer.GetTokens().GetEnumerator())
         {
             this.lexer = lexer;
-            this.enumerator = lexer.GetTokens().GetEnumerator();
+        }
+
+        public Parser(IEnumerator<TokenInfo> enumerator)
+        {
+            this.enumerator = enumerator;
             this.triviaBuffer = new Queue<TokenInfo>();
         }
 
@@ -51,17 +56,17 @@ namespace BasicSharp.Compiler.Parser
             {
                 hasImplementsDirective = true;
                 result.AddImplementsDirective(currImplDir);
-                dumpTriviaBufferInto(result);
+                dumpTrivia(result);
             }
 
             if (!hasImplementsDirective)
                 return null;
 
             var module = getModuleDeclaration();
-            dumpTriviaBufferInto(result);
+            dumpTrivia(result);
 
             if (module == null)
-                throw null;
+                handleError();
 
             result.Module = module;
 
@@ -77,15 +82,15 @@ namespace BasicSharp.Compiler.Parser
 
             var result = new ImplementsDirective { ImplementsToken = implements };
 
-            while (consumeCurrentTokenAndGetNext().Kind.IsIn(SyntaxKind.Identifier, SyntaxKind.DotToken))
+            while (moveNextToken().Kind.IsIn(SyntaxKind.Identifier, SyntaxKind.DotToken))
                 result.AddFullClassNamePart(currentToken());
 
             if (currentToken().Kind != SyntaxKind.SemicolonToken)
-                throw null;
+                handleError();
 
-            result.Semicolon = currentToken();
-            consumeCurrentTokenAndGetNext();
-            dumpTriviaBufferInto(result);
+            result.SemicolonToken = currentToken();
+            moveNextToken();
+            dumpTrivia(result);
 
             return result;
         }
@@ -97,37 +102,37 @@ namespace BasicSharp.Compiler.Parser
 
             var result = new ModuleDeclaration { ModuleToken = module };
 
-            var name = consumeCurrentTokenAndGetNext();
+            var name = moveNextToken();
             if (name.Kind != SyntaxKind.Identifier)
-                throw null;
+                handleError();
 
-            dumpTriviaBufferInto(result);
+            dumpTrivia(result);
             result.Name = name;
 
-            dumpTriviaBufferInto(result);
+            dumpTrivia(result);
 
-            var openBrace = consumeCurrentTokenAndGetNext();
+            var openBrace = moveNextToken();
             if (openBrace.Kind != SyntaxKind.OpenBraceToken)
-                throw null;
+                handleError();
 
-            result.OpenBrace = openBrace;
-            consumeCurrentTokenAndGetNext();
+            result.OpenBraceToken = openBrace;
+            moveNextToken();
 
-            dumpTriviaBufferInto(result);
+            dumpTrivia(result);
 
             ModuleMemberDeclaration member;
             while ((member = getFieldOrMethodDeclaration()) != null)
             {
                 result.AddMember(member);
-                dumpTriviaBufferInto(result);
+                dumpTrivia(result);
             }
 
-            var closeBrace = consumeCurrentTokenAndGetNext();
+            var closeBrace = moveNextToken();
             if (closeBrace.Kind != SyntaxKind.CloseBraceToken)
-                throw null;
+                handleError();
 
-            result.CloseBrace = closeBrace;
-            consumeCurrentTokenAndGetNext();
+            result.CloseBraceToken = closeBrace;
+            moveNextToken();
 
             return result;
         }
@@ -141,16 +146,16 @@ namespace BasicSharp.Compiler.Parser
             if (!modifier.Kind.IsModifier())
                 return null;
 
-            consumeCurrentTokenAndGetNext();
+            moveNextToken();
             var type = getPredefinedType();
             if (type == null)
-                throw null; //Type esperado, etc etc
+                handleError(); //Type esperado, etc etc
 
             var identifier = currentToken();
             if (identifier.Kind != SyntaxKind.Identifier)
-                throw null; //Type esperado, etc etc
+                handleError(); //Type esperado, etc etc
 
-            consumeCurrentTokenAndGetNext();
+            moveNextToken();
             var parameterList = getParameterList();
             if (parameterList != null)
                 return new MethodDeclaration
@@ -173,24 +178,24 @@ namespace BasicSharp.Compiler.Parser
 
             var result = new PredefinedType { TypeToken = type };
 
-            var openBracket = consumeCurrentTokenAndGetNext();
+            var openBracket = moveNextToken();
             if (openBracket.Kind == SyntaxKind.OpenBracketToken)
             {
-                consumeCurrentTokenAndGetNext();
+                moveNextToken();
 
                 var expression = getExpression();
                 var closeBracket = currentToken();
                 if (closeBracket.Kind != SyntaxKind.CloseBracketToken)
-                    throw null;
+                    handleError();
 
                 result.ArraySpecifier = new ArrayRankSpecifier
                 {
-                    OpenBracket = openBracket,
+                    OpenBracketToken = openBracket,
                     Value = expression,
-                    CloseBracket = closeBracket
+                    CloseBracketToken = closeBracket
                 };
 
-                consumeCurrentTokenAndGetNext();
+                moveNextToken();
             }
 
             return result;
@@ -200,81 +205,74 @@ namespace BasicSharp.Compiler.Parser
         {
             var result = new FieldDeclaration { Modifier = modifier };
 
-            var variableDeclaration = VariableDeclaration.WithDeclarator(getVariableDeclarator<ConstantAssignmentExpression>(identifier));
+            var variableDeclaration = VariableDeclaration.WithDeclarator(getVariableDeclarator(identifier));
             variableDeclaration.Type = type;
             result.Declaration = variableDeclaration;
 
             var current = currentToken();
             if (current.Kind == SyntaxKind.SemicolonToken)
             {
-                dumpTriviaBufferInto(variableDeclaration);
-                consumeCurrentTokenAndGetNext();
-                result.Semicolon = current;
+                dumpTrivia(variableDeclaration);
+                moveNextToken();
+                result.SemicolonToken = current;
                 return result;
             }
 
-            dumpTriviaBufferInto(variableDeclaration);
+            dumpTrivia(variableDeclaration);
             if (current.Kind != SyntaxKind.CommaToken)
-                throw null;
+                handleError();
 
             variableDeclaration.AddTrivia(currentToken());
-            consumeCurrentTokenAndGetNext();
-            VariableDeclarator<ConstantAssignmentExpression> varDecl;
-            while ((varDecl = getVariableDeclarator<ConstantAssignmentExpression>()) != null)
+            moveNextToken();
+            VariableDeclarator varDecl;
+            while ((varDecl = getVariableDeclarator()) != null)
             {
-                dumpTriviaBufferInto(variableDeclaration);
+                dumpTrivia(variableDeclaration);
                 variableDeclaration.AddDeclarator(varDecl);
 
                 if (currentToken().Kind == SyntaxKind.CommaToken)
                 {
                     variableDeclaration.AddTrivia(currentToken());
-                    consumeCurrentTokenAndGetNext();
+                    moveNextToken();
                 }
             }
 
             if (currentToken().Kind != SyntaxKind.SemicolonToken)
-                throw null;
+                handleError();
 
-            result.Semicolon = currentToken();
+            result.SemicolonToken = currentToken();
 
-            consumeCurrentTokenAndGetNext();
+            moveNextToken();
             return result;
         }
-        VariableDeclarator<T> getVariableDeclarator<T>()
-            where T : AssignmentExpression
+        VariableDeclarator getVariableDeclarator()
         {
             var current = currentToken();
 
             if (current.Kind != SyntaxKind.Identifier)
                 return null;
 
-            consumeCurrentTokenAndGetNext();
-            return getVariableDeclarator<T>(current);
+            moveNextToken();
+            return getVariableDeclarator(current);
         }
 
-        VariableDeclarator<T> getVariableDeclarator<T>(TokenInfo identifier)
-            where T : AssignmentExpression
+        VariableDeclarator getVariableDeclarator(TokenInfo identifier)
         {
             var current = currentToken();
 
             if (current.Kind.IsIn(SyntaxKind.CommaToken, SyntaxKind.SemicolonToken))
-                return new VariableDeclarator<T> { Identifier = identifier };
+                return new VariableDeclarator { Identifier = identifier };
 
             if (current.Kind == SyntaxKind.EqualsToken)
-                return new VariableDeclarator<T> { Identifier = identifier, Assignment = getAssignmentExpression<T>(current) };
+                return new VariableDeclarator { Identifier = identifier, Assignment = getAssignmentExpression(current) };
 
-            throw null;
+            handleError();
+            return null;
         }
-        T getAssignmentExpression<T>(TokenInfo assignmentOperatorInfo)
-            where T : AssignmentExpression
+        AssignmentExpression getAssignmentExpression(TokenInfo assignmentOperatorInfo)
         {
-            if (typeof(T) == typeof(ConstantAssignmentExpression))
-                throw null;
-
-            if (typeof(T) == typeof(AssignmentExpression))
-                throw null;
-
-            throw null;
+            handleError();
+            return null;
         }
 
         ParameterList getParameterList()
@@ -284,31 +282,31 @@ namespace BasicSharp.Compiler.Parser
                 return null;
 
             var result = new ParameterList { OpenParenToken = openParen };
-            consumeCurrentTokenAndGetNext();
+            moveNextToken();
 
             Parameter currParam;
             while ((currParam = getParameter()) != null)
             {
-                dumpTriviaBufferInto(result);
+                dumpTrivia(result);
                 result.AddParameter(currParam);
 
                 var comma = currentToken();
                 if (comma.Kind == SyntaxKind.CommaToken)
                 {
-                    dumpTriviaBufferInto(result);
+                    dumpTrivia(result);
                     result.AddTrivia(comma);
-                    consumeCurrentTokenAndGetNext();
+                    moveNextToken();
                 }
             }
 
             var closeParen = currentToken();
             if (closeParen.Kind != SyntaxKind.CloseParenToken)
-                throw null;
+                handleError();
 
-            dumpTriviaBufferInto(result);
+            dumpTrivia(result);
             result.CloseParenToken = closeParen;
 
-            consumeCurrentTokenAndGetNext();
+            moveNextToken();
             return result;
         }
         Parameter getParameter()
@@ -317,17 +315,17 @@ namespace BasicSharp.Compiler.Parser
             if (!type.Kind.IsTypeNotContextual())
                 return null;
 
-            var identifier = consumeCurrentTokenAndGetNext();
+            var identifier = moveNextToken();
             if (identifier.Kind != SyntaxKind.Identifier)
-                throw null;
+                handleError();
 
-            consumeCurrentTokenAndGetNext();
+            moveNextToken();
             var result = new Parameter { Type = type, Identifier = identifier };
-            dumpTriviaBufferInto(result);
+            dumpTrivia(result);
 
             return result;
         }
-        //MethodDeclaration ::=  Modifier? Method_Type Identifier Parameters_List Block
+        
         MethodDeclaration getMethod()
         {
             throw new NotImplementedException();
@@ -335,17 +333,226 @@ namespace BasicSharp.Compiler.Parser
         #endregion
 
         #region Block members
-        Block getBlock()
+        BlockStatement getBlock()
         {
             var openBrace = currentToken();
             if (openBrace.Kind != SyntaxKind.OpenBraceToken)
                 return null;
 
-            TokenInfo closeBrace;
-            while ((closeBrace = consumeCurrentTokenAndGetNext()).Kind != SyntaxKind.CloseBraceToken) { }
+            var result = new BlockStatement { OpenBraceToken = openBrace };
+            moveNextToken();
+            dumpTrivia(result);
 
-            consumeCurrentTokenAndGetNext();
-            return new Block { OpenBrace = openBrace, CloseBrace = closeBrace };
+            Statement stmt;
+            while ((stmt = getStatement()) != null)
+                result.AddStatement(stmt);
+
+            TokenInfo closeBrace = currentToken();
+            dumpTrivia(result);
+
+            moveNextToken();
+
+            if (closeBrace.Kind != SyntaxKind.CloseBraceToken)
+                handleError();
+
+            result.CloseBraceToken = closeBrace;
+
+            return result;
+        }
+
+        Statement getStatement()
+        {
+            return (Statement) getMethodInvocationStatement() ?? 
+                   (Statement) getReturnStatement() ??
+                   (Statement) getBreakStatement() ??
+                   (Statement) getIfStatement() ??
+                   (Statement) getForStatement() ??
+                   (Statement) getWhileStatement();
+        }
+
+        MethodInvocationStatement getMethodInvocationStatement()
+        {
+            var methodInvocation = getMethodInvocationExpression();
+            if (methodInvocation == null)
+                return null;
+
+            var semicolon = currentToken();
+            if (semicolon.Kind != SyntaxKind.SemicolonToken)
+                handleError();
+
+            moveNextToken();
+            var result = new MethodInvocationStatement
+            {
+                MethodInvocation = methodInvocation,
+                SemicolonToken = semicolon
+            };
+
+            dumpTrivia(result);
+
+            return result;
+        }
+
+        ReturnStatement getReturnStatement()
+        {
+            var returnToken = currentToken();
+            if (returnToken.Kind != SyntaxKind.ReturnKeyword)
+                return null;
+
+            var result = new ReturnStatement { ReturnToken = returnToken };
+            
+            moveNextToken();
+            dumpTrivia(result);
+
+            result.Expression = getExpression();
+
+            var semicolon = currentToken();
+            if (semicolon.Kind != SyntaxKind.SemicolonToken)
+                handleError();
+
+            moveNextToken();
+            result.SemicolonToken = semicolon;
+            dumpTrivia(result);
+            return result;
+        }
+
+        BreakStatement getBreakStatement()
+        {
+            var breakToken = currentToken();
+            if (breakToken.Kind != SyntaxKind.BreakKeyword)
+                return null;
+
+            var result = new BreakStatement { BreakToken = breakToken };
+            
+            dumpTrivia(result);
+
+            var semicolon = moveNextToken();
+            if (semicolon.Kind != SyntaxKind.SemicolonToken)
+                handleError();
+
+            moveNextToken();
+            dumpTrivia(result);
+
+            result.SemicolonToken = semicolon;
+
+            return result;
+
+        }
+
+        IfStatement getIfStatement()
+        {
+            var ifToken = currentToken();
+            if (ifToken.Kind != SyntaxKind.IfKeyword)
+                return null;
+
+            var result = new IfStatement { IfToken = ifToken };
+
+            var openParen = moveNextToken();
+            if (openParen.Kind != SyntaxKind.OpenParenToken)
+                handleError();
+            
+            result.OpenParenToken = openParen;
+
+            dumpTrivia(result);
+            moveNextToken();
+            result.Condition = getExpression();
+
+            var closeParen = currentToken();
+            if (closeParen.Kind != SyntaxKind.CloseParenToken)
+                handleError();
+
+            result.CloseParenToken = closeParen;
+
+            dumpTrivia(result);
+            moveNextToken();
+            result.Then = getBlock();
+
+            var elseToken = currentToken();
+            if (elseToken.Kind == SyntaxKind.ElseKeyword)
+            {
+                result.ElseToken = elseToken;
+
+                dumpTrivia(result);
+                
+                moveNextToken();
+
+                result.Else = getBlock();
+            }
+
+            return result;
+        }
+
+        ForStatement getForStatement()
+        {
+            var forToken = currentToken();
+            if (forToken.Kind != SyntaxKind.ForKeyword)
+                return null;
+
+            var result = new ForStatement { ForToken = forToken };
+            dumpTrivia(result);
+
+            var openParen = moveNextToken();
+            if (openParen.Kind != SyntaxKind.OpenParenToken)
+                handleError();
+
+            moveNextToken();
+
+            result.OpenParenToken = openParen;
+            dumpTrivia(result);
+
+            result.Initializer = getExpression();
+            var firstSemicolon = currentToken();
+            if (firstSemicolon.Kind != SyntaxKind.SemicolonToken)
+                handleError();
+
+            result.FirstSemicolonToken = firstSemicolon;
+            dumpTrivia(result);
+
+            moveNextToken();
+            result.Condition = getExpression();
+            var secondSemicolon = currentToken();
+            if (secondSemicolon.Kind != SyntaxKind.SemicolonToken)
+                handleError();
+
+            moveNextToken();
+            result.SecondSemicolonToken = secondSemicolon;
+            dumpTrivia(result);
+
+            result.Incrementor = getExpression();
+
+            result.Block = getBlock();
+
+            return result;
+        }
+
+        WhileStatement getWhileStatement()
+        {
+            var whileToken = currentToken();
+            if (whileToken.Kind != SyntaxKind.WhileKeyword)
+                return null;
+
+            var result = new WhileStatement { WhileToken = whileToken };
+
+            var openParen = moveNextToken();
+            if (openParen.Kind != SyntaxKind.OpenParenToken)
+                handleError();
+
+            result.OpenParenToken = openParen;
+
+            dumpTrivia(result);
+            moveNextToken();
+            result.Condition = getExpression();
+
+            var closeParen = currentToken();
+            if (closeParen.Kind != SyntaxKind.CloseParenToken)
+                handleError();
+
+            result.CloseParenToken = closeParen;
+
+            dumpTrivia(result);
+            moveNextToken();
+            result.Block = getBlock();
+
+            return result;
         }
 
         LocalVariableDeclaration getLocalVariableDeclaration()
@@ -364,28 +571,29 @@ namespace BasicSharp.Compiler.Parser
         {
             Expression root;
 
+            //if((root = getBooleanExpression()) != null)
+            //    return root;
+
             if ((root = getArithmeticBinaryExpression()) != null)
                 return root;
 
-            return new ConstantAssignmentExpression();
+            return null;
         }
 
+        //UNDONE: Precedence is not respected
         Expression getArithmeticBinaryExpression()
         {
-            Expression root = getUnaryExpression();
+            Expression root = getAdditiveExpression(null), aux = null;
 
             if (root == null)
                 return null;
 
-            Expression aux = null;
             while(true)
             {
-                if ((aux = getAdditiveExpression(root)) != root)
+                if ((aux = getAdditiveExpression(root)) != root) {
                     root = aux;
-                else if ((aux = getMultiplicativeExpression(root)) != root)
-                    root = aux;
-                else if ((aux = getModExpression(root)) != root)
-                    root = aux;
+                    continue;
+                }
                 else
                     break;
             }
@@ -393,9 +601,53 @@ namespace BasicSharp.Compiler.Parser
             return root;
         }
 
+        Expression getBooleanExpression()
+        {
+            var result = getArithmeticBinaryExpression() ?? getBooleanLiteralOrAccessor();
+            if (result == null)
+                return null;
+
+            TokenInfo c;
+            while ((c = currentToken()).Kind != SyntaxKind.SemicolonToken && c.Kind != SyntaxKind.None)
+            {
+                if (c.Kind.IsLogicalOperator())
+                {
+                    moveNextToken();
+                    var rightSide = getArithmeticBinaryExpression() ?? getBooleanLiteralOrAccessor();
+
+                    if (rightSide == null)
+                        handleError();
+
+                    result = new BinaryExpression
+                    {
+                        LeftSide = result,
+                        OperatorToken = c,
+                        RightSide = rightSide
+                    };
+                }
+            }
+
+            return result;
+        }
+        Expression getBooleanLiteralOrAccessor()
+        {
+            Expression result;
+
+            var tknCurrent = currentToken();
+            if (tknCurrent.Kind.IsIn(SyntaxKind.FalseKeyword, SyntaxKind.TrueKeyword))
+            {
+                result = new LiteralExpression { Value = tknCurrent };
+                moveNextToken();
+            }
+            else
+                result = getMethodInvocationOrAccessorExpression();
+
+            return result;
+        }
+
         Expression getUnaryExpression()
         {
-            return getLiteralExpression() ?? getInvocationOrAccessorExpression() ?? getSignedUnaryExpression();
+            return getNumericLiteralExpression() ?? getMethodInvocationOrAccessorExpression() ?? getSignedUnaryExpression();
         }
 
         ParenthesedExpression getParenthesedExpression()
@@ -404,17 +656,17 @@ namespace BasicSharp.Compiler.Parser
             if (openParen.Kind != SyntaxKind.OpenParenToken)
                 return null;
 
-            consumeCurrentTokenAndGetNext();
+            moveNextToken();
             var innerExpression = getExpression();
 
             if (innerExpression == null)
-                throw null;
+                handleError();
 
             var closeParen = currentToken();
             if (closeParen.Kind != SyntaxKind.CloseParenToken)
-                throw null;
+                handleError();
 
-            consumeCurrentTokenAndGetNext();
+            moveNextToken();
             return new ParenthesedExpression
             {
                 OpenParenToken = openParen,
@@ -423,28 +675,49 @@ namespace BasicSharp.Compiler.Parser
             };
         }
 
-        Expression getInvocationOrAccessorExpression()
+        Expression getMethodInvocationOrAccessorExpression()
         {
             var identifier = currentToken();
             if (identifier.Kind != SyntaxKind.Identifier)
                 return null;
 
-            var openParen = consumeCurrentTokenAndGetNext();
+            var openParen = moveNextToken();
             if (openParen.Kind != SyntaxKind.OpenParenToken)
-                return new AccessorExpression { Identifier = identifier };
+            {
+                var result = new AccessorExpression { Identifier = identifier };
+                dumpTrivia(result);
+                return result;
+            }
 
-            consumeCurrentTokenAndGetNext();
+            moveNextToken();
+            return getMethodInvocationExpression(identifier, openParen);
+        }
 
-            var result = new InvocationExpression { MethodName = identifier };
-            dumpTriviaBufferInto(result);
+        MethodInvocationExpression getMethodInvocationExpression(TokenInfo identifier = null, TokenInfo openParen = null)
+        {
+            if (identifier == null && openParen == null)
+            {
+                identifier = currentToken();
+                if (identifier.Kind != SyntaxKind.Identifier)
+                    return null;
 
-            var arguments = new ArgumentList { OpenParen = openParen };
+                openParen = moveNextToken();
+                if (openParen.Kind != SyntaxKind.OpenParenToken)
+                    handleError();
+
+                moveNextToken();
+            }
+
+            var result = new MethodInvocationExpression { MethodName = identifier };
+            dumpTrivia(result);
+
+            var arguments = new ArgumentList { OpenParenToken = openParen };
             result.Arguments = arguments;
 
             TokenInfo c;
             while ((c = currentToken()).Kind != SyntaxKind.CloseParenToken)
             {
-                dumpTriviaBufferInto(arguments);
+                dumpTrivia(arguments);
 
                 var expr = getExpression();
                 if (expr != null)
@@ -453,33 +726,35 @@ namespace BasicSharp.Compiler.Parser
                     if (currentToken().Kind == SyntaxKind.CommaToken)
                     {
                         arguments.AddTrivia(currentToken());
-                        consumeCurrentTokenAndGetNext();
+                        moveNextToken();
                     }
                 }
             }
 
-            arguments.CloseParen = currentToken();
-            dumpTriviaBufferInto(arguments);
+            arguments.CloseParenToken = currentToken();
+            dumpTrivia(arguments);
 
-            consumeCurrentTokenAndGetNext();
+            moveNextToken();
 
             return result;
         }
-
+        
         Expression getAdditiveExpression(Expression leftSide)
         {
-            leftSide = leftSide ?? getUnaryExpression();
+            leftSide = leftSide ?? getMultiplicativeExpression(null);
 
-            dumpTriviaBufferInto(leftSide);
+            if (leftSide == null)
+                return null;
 
+            dumpTrivia(leftSide);
             var op = currentToken();
 
             if (!op.Kind.IsIn(SyntaxKind.PlusToken, SyntaxKind.MinusToken))
-                return leftSide;
+                return getMultiplicativeExpression(leftSide);
 
-            consumeCurrentTokenAndGetNext();
+            moveNextToken();
 
-            var rightSide = getModExpression(null);
+            var rightSide = getMultiplicativeExpression(null);
 
             return new BinaryExpression
             {
@@ -491,16 +766,19 @@ namespace BasicSharp.Compiler.Parser
 
         Expression getMultiplicativeExpression(Expression leftSide)
         {
-            leftSide = leftSide ?? getAdditiveExpression(null);
+            leftSide = leftSide ?? getModExpression(null);
 
-            dumpTriviaBufferInto(leftSide);
+            if (leftSide == null)
+                return null;
+
+            dumpTrivia(leftSide);
 
             var op = currentToken();
 
             if (!op.Kind.IsIn(SyntaxKind.AsteriskToken, SyntaxKind.SlashToken))
-                return leftSide;
+                return getModExpression(leftSide);
 
-            consumeCurrentTokenAndGetNext();
+            moveNextToken();
 
             var rightSide = getModExpression(null);
 
@@ -514,18 +792,21 @@ namespace BasicSharp.Compiler.Parser
 
         Expression getModExpression(Expression leftSide)
         {
-            leftSide = leftSide ?? getMultiplicativeExpression(null);
-
-            dumpTriviaBufferInto(leftSide);
+            leftSide = leftSide ?? getUnaryExpression();
+            
+            if (leftSide == null)
+                return null;
+            
+            dumpTrivia(leftSide);
 
             var op = currentToken();
 
-            if (!op.Kind.IsIn(SyntaxKind.ModToken))
+            if (!op.Kind.IsIn(SyntaxKind.ModOperator))
                 return leftSide;
 
-            consumeCurrentTokenAndGetNext();
+            moveNextToken();
 
-            var rightSide = getUnaryExpression();
+            var rightSide = getModExpression(null);
 
             return new BinaryExpression
             {
@@ -541,44 +822,48 @@ namespace BasicSharp.Compiler.Parser
             
             if (signal.Kind.IsIn(SyntaxKind.MinusToken, SyntaxKind.PlusToken))
             {
-                consumeCurrentTokenAndGetNext();
-                return new UnaryExpression { SignalToken = signal, Expression = getExpression() };
+                moveNextToken();
+                return new UnaryExpression { SignalToken = signal, Expression = getNumericLiteralExpression() ?? getMethodInvocationOrAccessorExpression() ?? getParenthesedExpression() as Expression };
             }
 
-            return getLiteralExpression() ?? getInvocationOrAccessorExpression() ?? getParenthesedExpression() as Expression;
+            return getNumericLiteralExpression() ?? getMethodInvocationOrAccessorExpression() ?? getParenthesedExpression() as Expression;
         }
 
-        LiteralExpression getLiteralExpression()
+        LiteralExpression getNumericLiteralExpression()
         {
             var value = currentToken();
 
-            if (!value.Kind.IsLiteral())
+            if (!value.Kind.IsNumericLiteral())
                 return null;
 
-            consumeCurrentTokenAndGetNext();
+            moveNextToken();
 
             var result = new LiteralExpression { Value = value };
-            dumpTriviaBufferInto(result);
+            dumpTrivia(result);
             
             return result;
         }
         #endregion
 
-        void dumpTriviaBufferInto(SyntaxNode node)
+        void dumpTrivia(SyntaxNode node)
         {
             while (triviaBuffer.Count > 0)
                 node.AddTrivia(triviaBuffer.Dequeue());
         }
         TokenInfo currentToken()
         {
+            if (enumerator.Current == null)
+                return new TokenInfo { Kind = SyntaxKind.None };
+
             if (enumerator.Current.Kind.IsTrivia())
-                return consumeCurrentTokenAndGetNext();
+                return moveNextToken();
 
             return enumerator.Current;
         }
-        TokenInfo consumeCurrentTokenAndGetNext()
+        TokenInfo moveNextToken()
         {
-            while (enumerator.MoveNext())
+            var hasNext = true;
+            while (hasNext = enumerator.MoveNext())
             {
                 if (enumerator.Current.Kind.IsTrivia())
                     triviaBuffer.Enqueue(enumerator.Current);
@@ -586,8 +871,16 @@ namespace BasicSharp.Compiler.Parser
                     break;
             }
 
+            if (!hasNext)
+                return new TokenInfo { Kind = SyntaxKind.None };
+
             return enumerator.Current;
         }
 
+        //TODO: Implements Error Handler
+        void handleError()
+        {
+            throw new Exception();
+        }
     }
 }

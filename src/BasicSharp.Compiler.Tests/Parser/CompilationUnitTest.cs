@@ -38,7 +38,7 @@ namespace BasicSharp.Compiler.Tests.Parser
             var m = result as CompilationUnit;
 
             result.Should().BeOfType<CompilationUnit>();
-            m.ToString().Should().BeEquivalentTo(source, "because ToString() override must be concise");
+            m.AsString().Should().BeEquivalentTo(source, "because AsString() override must be concise");
         }
 
     }

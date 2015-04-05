@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BasicSharp.Compiler.Parser.Extensions;
+using System.Collections;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
@@ -23,6 +24,13 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 
             foreach (var item in RightSide.GetTokenEnumerable())
                 yield return item;
+        }
+
+        public override IEnumerable GetChilds()
+        {
+            yield return LeftSide;
+            yield return OperatorToken;
+            yield return RightSide;
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BasicSharp.Compiler.Parser;
+using System.Collections;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
@@ -19,6 +20,12 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             if (ArraySpecifier != null)
                 foreach (var item in ArraySpecifier.Tokens)
                     yield return item;
+        }
+
+        public override IEnumerable GetChilds()
+        {
+            yield return TypeToken;
+            yield return ArraySpecifier;
         }
     }
 }

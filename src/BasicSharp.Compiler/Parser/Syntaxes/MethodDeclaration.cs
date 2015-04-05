@@ -30,7 +30,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 
         public ParameterList ParameterList { get; internal set; }
 
-        public Block Block { get; internal set; }
+        public BlockStatement Block { get; internal set; }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()
         {
@@ -46,6 +46,15 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 
             foreach (var item in Block.GetTokenEnumerable())
                 yield return item;
+        }
+
+        public override System.Collections.IEnumerable GetChilds()
+        {
+            yield return Modifier;
+            yield return ReturnType;
+            yield return Identifier;
+            yield return ParameterList;
+            yield return Block;
         }
     }
 }

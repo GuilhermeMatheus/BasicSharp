@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BasicSharp.Compiler.Parser.Extensions;
+using System.Collections;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
@@ -12,6 +13,11 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
         public TokenInfo Identifier { get; internal set; }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()
+        {
+            yield return Identifier;
+        }
+
+        public override IEnumerable GetChilds()
         {
             yield return Identifier;
         }

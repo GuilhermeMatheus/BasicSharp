@@ -183,26 +183,25 @@ namespace BasicSharp.Compiler.Lexer
 
         }
         
-        //UNDONE: Logical Operators arent recognized
         TokenInfo scanAssignmentOrRelationalOperator()
         {
             var ret = new TokenInfo { Begin = text.Offset, Kind = SyntaxKind.None };
             var stringValue = string.Empty;
 
             if (text.AdvanceIfMatches(stringValue = "=="))
-                ret.Kind = SyntaxKind.EqualsEqualsToken;
+                ret.Kind = SyntaxKind.EqualsEqualsOperator;
             else if (text.AdvanceIfMatches(stringValue = "="))
                 ret.Kind = SyntaxKind.EqualsToken;
             else if (text.AdvanceIfMatches(stringValue = "<="))
-                ret.Kind = SyntaxKind.MinorEqualsToken;
+                ret.Kind = SyntaxKind.MinorEqualsOperator;
             else if (text.AdvanceIfMatches(stringValue = "<"))
-                ret.Kind = SyntaxKind.MinorToken;
+                ret.Kind = SyntaxKind.MinorOperator;
             else if (text.AdvanceIfMatches(stringValue = ">="))
-                ret.Kind = SyntaxKind.MajorEqualsToken;
+                ret.Kind = SyntaxKind.MajorEqualsOperator;
             else if (text.AdvanceIfMatches(stringValue = ">"))
-                ret.Kind = SyntaxKind.MajorToken;
+                ret.Kind = SyntaxKind.MajorOperator;
             else if (text.AdvanceIfMatches(stringValue = "%"))
-                ret.Kind = SyntaxKind.ModToken;
+                ret.Kind = SyntaxKind.ModOperator;
             else if (text.AdvanceIfMatches(stringValue = "+="))
                 ret.Kind = SyntaxKind.PlusEqualsToken;
             else if (text.AdvanceIfMatches(stringValue = "+"))
@@ -383,8 +382,9 @@ namespace BasicSharp.Compiler.Lexer
             var ret = new TokenInfo { Begin = text.Offset, Kind = SyntaxKind.SingleLineCommentTrivia };
             var stringValue = "//";
 
+            char c;
             if (text.AdvanceIfMatches("//"))
-                while (!text.Peek().IsLineBreak())
+                while (!(c = text.Peek()).IsLineBreak() && c != SlidingText.INVALID_CHAR)
                     stringValue += text.Next();
             else
                 handleSyntacticError(SyntacticExceptions.SymbolNotExpected(text, text.Peek(1).ToString(), ret, "/"), ret);

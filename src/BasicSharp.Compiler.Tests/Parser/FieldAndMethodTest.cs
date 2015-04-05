@@ -23,7 +23,7 @@ namespace BasicSharp.Compiler.Tests.Parser
             m.Name.Should().Be("m");
             m.Arity.Should().Be(2, "because it has only 2 parameters");
             m.IsPublic.Should().BeFalse("because it's a private method");
-            m.ToString().Should().BeEquivalentTo(source, "because ToString() override must be concise");
+            m.AsString().Should().BeEquivalentTo(source, "because AsString() override must be concise");
         }
 
         [TestMethod]
@@ -38,7 +38,7 @@ namespace BasicSharp.Compiler.Tests.Parser
             f.Declaration.Type.TypeToken.Kind.Should().Be(SyntaxKind.IntKeyword, "because its a Integer field declaration");
             f.Declaration.Declarators.Count.Should().Be(6, "because it has 6 fields declarators");
             f.IsPublic.Should().BeTrue("because it's a public fields");
-            f.ToString().Should().BeEquivalentTo(source, "because ToString() override must be concise");
+            f.AsString().Should().BeEquivalentTo(source, "because AsString() override must be concise");
         }
     }
 }

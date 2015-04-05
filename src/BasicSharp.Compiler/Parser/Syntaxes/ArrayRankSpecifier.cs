@@ -9,19 +9,26 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 {
     public class ArrayRankSpecifier : SyntaxNode
     {
-        public TokenInfo OpenBracket { get; internal set; }
+        public TokenInfo OpenBracketToken { get; internal set; }
         public Expression Value { get; internal set; }
-        public TokenInfo CloseBracket { get; set; }
+        public TokenInfo CloseBracketToken { get; set; }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()
         {
-            yield return OpenBracket;
+            yield return OpenBracketToken;
             
             if (Value != null)
                 foreach (var item in Value.Tokens)
                     yield return item;
 
-            yield return CloseBracket;
+            yield return CloseBracketToken;
+        }
+
+        public override System.Collections.IEnumerable GetChilds()
+        {
+            yield return OpenBracketToken;
+            yield return Value;
+            yield return CloseBracketToken;
         }
     }
 }

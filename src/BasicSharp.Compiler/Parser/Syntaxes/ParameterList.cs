@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using BasicSharp.Compiler.Parser.Extensions;
+using System.Collections;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
@@ -34,6 +35,16 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             foreach (var param in parameters)
                 foreach (var item in param.GetTokenEnumerable())
                     yield return item;
+
+            yield return CloseParenToken;
+        }
+
+        public override IEnumerable GetChilds()
+        {
+            yield return OpenParenToken;
+
+            foreach (var param in parameters)
+                yield return param;
 
             yield return CloseParenToken;
         }

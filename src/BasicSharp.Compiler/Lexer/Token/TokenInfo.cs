@@ -23,6 +23,11 @@ namespace BasicSharp.Compiler.Lexer
         public double DoubleValue { get; set; }
 
         #region Object Overrides
+        public override string ToString()
+        {
+            return Kind.ToString();
+        }
+
         public override bool Equals(object obj)
         {
             if (obj == null || GetType() != obj.GetType())

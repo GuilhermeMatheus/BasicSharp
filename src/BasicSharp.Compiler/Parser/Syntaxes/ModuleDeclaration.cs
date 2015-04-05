@@ -6,6 +6,7 @@ using System.Text;
 using BasicSharp.Compiler.Parser;
 using System.Collections.ObjectModel;
 using BasicSharp.Compiler.Parser.Extensions;
+using System.Collections;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
@@ -15,12 +16,12 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
         
         public TokenInfo ModuleToken { get; internal set; }
         public TokenInfo Name { get; internal set; }
-        public TokenInfo OpenBrace { get; internal set; }
+        public TokenInfo OpenBraceToken { get; internal set; }
         public ReadOnlyCollection<ModuleMemberDeclaration> Members
         {
             get { return members.AsReadOnly(); }
         }
-        public TokenInfo CloseBrace { get; internal set; }
+        public TokenInfo CloseBraceToken { get; internal set; }
 
         public void AddMember(ModuleMemberDeclaration member)
         {
@@ -31,13 +32,25 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
         {
             yield return ModuleToken;
             yield return Name;
-            yield return OpenBrace;
+            yield return OpenBraceToken;
 
             foreach (var m in members)
                 foreach (var item in m.GetTokenEnumerable())
                     yield return item;
             
-            yield return CloseBrace;
+            yield return CloseBraceToken;
+        }
+
+        public override IEnumerable GetChilds()
+        {
+            yield return ModuleToken;
+            yield return Name;
+            yield return OpenBraceToken;
+
+            foreach (var m in members)
+                yield return m;
+
+            yield return CloseBraceToken;
         }
     }
 }

@@ -6,33 +6,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BasicSharp.Compiler.Parser.Extensions;
+using System.Collections;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
-    public static class VariableDeclaration
+    public class VariableDeclaration : SyntaxNode 
     {
-        public static VariableDeclaration<TD> WithDeclarator<TD>(VariableDeclarator<TD> declarator)
-            where TD : AssignmentExpression
-        {
-            var result = new VariableDeclaration<TD>();
-            result.AddDeclarator(declarator);
-
-            return result;
-        }
-    }
-
-    public class VariableDeclaration<T> : SyntaxNode 
-        where T : AssignmentExpression
-    {
-        List<VariableDeclarator<T>> declarators = new List<VariableDeclarator<T>>();
+        List<VariableDeclarator> declarators = new List<VariableDeclarator>();
 
         public PredefinedType Type { get; internal set; }
-        public ReadOnlyCollection<VariableDeclarator<T>> Declarators
+        public ReadOnlyCollection<VariableDeclarator> Declarators
         {
-            get { return new ReadOnlyCollection<VariableDeclarator<T>>(declarators); }
+            get { return new ReadOnlyCollection<VariableDeclarator>(declarators); }
         }
 
-        public void AddDeclarator(VariableDeclarator<T> declarator)
+        public void AddDeclarator(VariableDeclarator declarator)
         {
             this.declarators.Add(declarator);
         }
@@ -45,6 +33,21 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             foreach (var decl in declarators)
                 foreach (var item in decl.GetTokenEnumerable())
                     yield return item;
+        }
+
+        public static VariableDeclaration WithDeclarator(VariableDeclarator declarator)
+        {
+            var result = new VariableDeclaration();
+            result.AddDeclarator(declarator);
+
+            return result;
+        }
+
+        public override IEnumerable GetChilds()
+        {
+            yield return Type;
+            foreach (var item in Declarators)
+                yield return item;
         }
     }
 }

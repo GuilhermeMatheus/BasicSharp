@@ -6,6 +6,7 @@ using BasicSharp.Compiler.Parser.Extensions;
 using BasicSharp.Compiler.Lexer;
 using BasicSharp.Compiler.Parser;
 using System.Collections.ObjectModel;
+using System.Collections;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
@@ -13,12 +14,12 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
     {
         List<Argument> arguments = new List<Argument>();
         
-        public TokenInfo OpenParen { get; set; }
+        public TokenInfo OpenParenToken { get; set; }
         public ReadOnlyCollection<Argument> Arguments
         {
             get { return arguments.AsReadOnly(); }
         }
-        public TokenInfo CloseParen { get; set; }
+        public TokenInfo CloseParenToken { get; set; }
 
         public void AddArgument(Argument argument)
         {
@@ -27,13 +28,23 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 
         public override IEnumerable<TokenInfo> GetInternalTokens()
         {
-            yield return OpenParen;
+            yield return OpenParenToken;
 
             foreach (var arg in arguments)
                 foreach (var item in arg.GetTokenEnumerable())
                     yield return item;
 
-            yield return CloseParen;
+            yield return CloseParenToken;
+        }
+
+        public override IEnumerable GetChilds()
+        {
+            yield return OpenParenToken;
+
+            foreach (var arg in arguments)
+                yield return arg;
+
+            yield return CloseParenToken;
         }
     }
 }

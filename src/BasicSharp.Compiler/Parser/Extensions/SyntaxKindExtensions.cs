@@ -55,7 +55,24 @@ namespace BasicSharp.Compiler.Parser.Extensions
             return false;
         }
 
-        public static bool IsOperator(this SyntaxKind syntaxKind)
+        public static bool IsLogicalOperator(this SyntaxKind syntaxKind)
+        {
+            switch (syntaxKind)
+            {
+                case SyntaxKind.EqualsEqualsOperator:
+                case SyntaxKind.MinorOperator:
+                case SyntaxKind.MinorEqualsOperator:
+                case SyntaxKind.MajorOperator:
+                case SyntaxKind.MajorEqualsOperator:
+                case SyntaxKind.AndOperator:
+                case SyntaxKind.OrOperator:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public static bool IsArithmeticOperator(this SyntaxKind syntaxKind)
         {
             switch (syntaxKind)
             {
@@ -63,22 +80,20 @@ namespace BasicSharp.Compiler.Parser.Extensions
                 case SyntaxKind.MinusToken:
                 case SyntaxKind.AsteriskToken:
                 case SyntaxKind.SlashToken:
-                case SyntaxKind.ModToken:
+                case SyntaxKind.ModOperator:
                     return true;
                 default:
                     return false;
             }
         }
     
-        public static bool IsLiteral(this SyntaxKind syntaxKind)
+        public static bool IsNumericLiteral(this SyntaxKind syntaxKind)
         {
             switch (syntaxKind)
             {
                 case SyntaxKind.ByteLiteral:
-                case SyntaxKind.CharLiteral:
                 case SyntaxKind.DoubleLiteral:
                 case SyntaxKind.IntegerLiteral:
-                case SyntaxKind.StringLiteral:
                     return true;
                 default:
                     return false;

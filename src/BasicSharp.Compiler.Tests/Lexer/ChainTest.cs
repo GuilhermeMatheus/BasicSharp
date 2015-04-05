@@ -20,7 +20,7 @@ namespace BasicSharp.Compiler.Tests.Lexer
                                            SyntaxKind.IntKeyword, SyntaxKind.WhitespaceTrivia, SyntaxKind.Identifier,
                                            SyntaxKind.WhitespaceTrivia, SyntaxKind.EqualsToken, SyntaxKind.WhitespaceTrivia,
                                            SyntaxKind.IntegerLiteral, SyntaxKind.SemicolonToken, SyntaxKind.WhitespaceTrivia,
-                                           SyntaxKind.Identifier, SyntaxKind.WhitespaceTrivia, SyntaxKind.MinorToken,
+                                           SyntaxKind.Identifier, SyntaxKind.WhitespaceTrivia, SyntaxKind.MinorOperator,
                                            SyntaxKind.WhitespaceTrivia, SyntaxKind.Identifier, SyntaxKind.OpenParenToken,
                                            SyntaxKind.CloseParenToken, SyntaxKind.SemicolonToken, SyntaxKind.WhitespaceTrivia,
                                            SyntaxKind.Identifier, SyntaxKind.PlusEqualsToken, SyntaxKind.IntegerLiteral,

@@ -74,6 +74,32 @@ namespace BasicSharp.Compiler.Tests.Parser
         }
 
         [TestMethod]
+        public void GetSyntax_WithComplexPrecedenceMathExpression_Evaluating()
+        {
+            var source = "1 + 2 * 3 \\ 4 % 5 * 6 \\ 7 + 8";
+            var parser = ParserFactory.FromString(source);
+            var b = parser.GetSyntax() as BinaryExpression;
+
+            int expected = 1 + 2 * 3 / 4 % 5 * 6 / 7 + 8;
+            var result = b.EvaluateTreeValueAsInt();
+
+            result.ShouldBeEquivalentTo(expected);
+        }
+
+        [TestMethod]
+        public void GetSyntax_WithAllArithmeticTypes_Evaluating()
+        {
+            var source = "1 + -(2 * 2) % 2 + -(3)";
+            var parser = ParserFactory.FromString(source);
+            var b = parser.GetSyntax() as BinaryExpression;
+
+            int expected = 1 + -(2 * 2) % 2 + -(3);
+            var result = b.EvaluateTreeValueAsInt();
+
+            result.ShouldBeEquivalentTo(expected);
+        }
+
+        [TestMethod]
         public void GetSyntax_WithMembersArithmeticManipulation_ShouldReturnTheCorrectAST()
         {
             var source = "getRandom(0.0, 1.0) + sqrt(n) - m + 2";

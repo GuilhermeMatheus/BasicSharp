@@ -33,5 +33,13 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             foreach (var item in Module.GetTokenEnumerable())
                 yield return item;
         }
+
+        public override System.Collections.IEnumerable GetChilds()
+        {
+            foreach (var impl in implementsDirectives)
+                yield return impl;
+
+            yield return Module;
+        }
     }
 }
