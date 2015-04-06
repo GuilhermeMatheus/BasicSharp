@@ -732,16 +732,33 @@ namespace BasicSharp.Compiler.Parser
             if (identifier.Kind != SyntaxKind.Identifier)
                 return null;
 
-            var openParen = moveNextToken();
-            if (openParen.Kind != SyntaxKind.OpenParenToken)
+            var curr = moveNextToken();
+            if (curr.Kind == SyntaxKind.OpenParenToken)
             {
-                var result = new AccessorExpression { Identifier = identifier };
-                dumpTrivia(result);
-                return result;
+                moveNextToken();
+                return getMethodInvocationExpression(identifier, curr);
             }
 
-            moveNextToken();
-            return getMethodInvocationExpression(identifier, openParen);
+            var result = new AccessorExpression { Identifier = identifier };
+            dumpTrivia(result);
+
+            if (curr.Kind == SyntaxKind.OpenBracketToken)
+            {
+                var bracketed = new BracketedArgument { OpenBracketToken = curr };
+                moveNextToken();
+                bracketed.ArgumentExpression = getExpression();
+
+                if (currentToken().Kind != SyntaxKind.CloseBracketToken)
+                    handleError();
+
+                bracketed.CloseBracketToken = currentToken();
+                moveNextToken();
+
+                result.BracketedArgument = bracketed;
+                dumpTrivia(bracketed);
+            }
+            
+            return result;
         }
 
         MethodInvocationExpression getMethodInvocationExpression(TokenInfo identifier = null, TokenInfo openParen = null)

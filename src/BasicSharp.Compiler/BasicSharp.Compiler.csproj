@@ -48,6 +48,7 @@
     <Compile Include="Lexer\SyntacticException.cs" />
     <Compile Include="Lexer\Token\SyntaxKind.cs" />
     <Compile Include="Lexer\Token\TokenInfo.cs" />
+    <Compile Include="Parser\Syntaxes\Expressions\BracketedArgument.cs" />
     <Compile Include="Parser\Syntaxes\Statements\MethodInvocationStatement.cs" />
     <Compile Include="Parser\Syntaxes\Statements\BreakStatement.cs" />
     <Compile Include="Parser\Extensions\ExpressionExtensions.cs" />
