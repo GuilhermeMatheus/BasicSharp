@@ -54,13 +54,16 @@ namespace BasicSharp.IDE.ViewModel
             }
         }
 
-        private IEnumerable syntax;
-        public IEnumerable Syntax
+        private List<SyntaxNode> syntax;
+        public List<SyntaxNode> Syntax
         {
             get { return syntax; }
             set
             {
-                if (syntax == value) return; syntax = value;
+                if (syntax == value) 
+                    return;
+                
+                syntax = value;
                 OnPropertyChanged();
             }
         }
@@ -77,7 +80,8 @@ namespace BasicSharp.IDE.ViewModel
             var parser = new Parser(tokens.GetEnumerator());
 
             Tokens = new ObservableCollection<TokenInfo>(tokens);
-            Syntax = parser.GetSyntax().GetChilds();
+
+            Syntax = new List<SyntaxNode> { parser.GetSyntax() };
         }
     }
 }

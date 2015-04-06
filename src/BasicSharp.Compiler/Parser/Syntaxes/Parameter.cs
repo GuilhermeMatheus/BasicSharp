@@ -5,17 +5,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BasicSharp.Compiler.Parser.Extensions;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
     public class Parameter : SyntaxNode
     {
-        public TokenInfo Type { get; internal set; }
+        public PredefinedType Type { get; internal set; }
         public TokenInfo Identifier { get; internal set; }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()
         {
-            yield return Type;
+            foreach (var item in Type.GetTokenEnumerable())
+                yield return item;
+
             yield return Identifier;
         }
 

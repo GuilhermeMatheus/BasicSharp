@@ -9,5 +9,6 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
     public interface ISyntaxTreeNode
     {
         IEnumerable Childs { get; }
+        string DisplayMember { get; }
     }
 }

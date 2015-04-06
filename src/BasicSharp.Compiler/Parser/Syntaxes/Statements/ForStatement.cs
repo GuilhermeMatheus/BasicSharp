@@ -20,6 +20,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
         public TokenInfo SecondSemicolonToken { get; internal set; }
         
         public Expression Incrementor { get; internal set; }
+        public TokenInfo CloseParenToken { get; internal set; }
 
         public BlockStatement Block { get; internal set; }
 
@@ -32,6 +33,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             yield return Condition;
             yield return SecondSemicolonToken;
             yield return Incrementor;
+            yield return CloseParenToken;
             yield return Block;
         }
 
@@ -52,7 +54,9 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             
             foreach (var item in Incrementor.GetTokenEnumerable())
                 yield return item;
-            
+
+            yield return CloseParenToken;
+
             foreach (var item in Block.GetTokenEnumerable())
                 yield return item;
         }

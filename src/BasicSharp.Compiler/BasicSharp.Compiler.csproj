@@ -65,7 +65,7 @@
     <Compile Include="Parser\Extensions\SyntaxNodeExtensions.cs" />
     <Compile Include="Parser\Syntaxes\Expressions\MethodInvocationExpression.cs" />
     <Compile Include="Parser\Syntaxes\ISyntaxTreeNode.cs" />
-    <Compile Include="Parser\Syntaxes\LocalVariableDeclaration.cs" />
+    <Compile Include="Parser\Syntaxes\Statements\LocalVariableDeclarationStatement.cs" />
     <Compile Include="Parser\Syntaxes\Expressions\ParenthesedExpression.cs" />
     <Compile Include="Parser\Syntaxes\PredefinedType.cs" />
     <Compile Include="Parser\Syntaxes\CompilationUnit.cs" />

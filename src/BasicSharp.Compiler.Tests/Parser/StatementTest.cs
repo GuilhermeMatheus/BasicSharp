@@ -13,6 +13,37 @@ namespace BasicSharp.Compiler.Tests.Parser
     public class BooleanExpressionsTest
     {
         [TestMethod]
+        public void GetSyntax_WithAllStatements_ShouldReturnTheCorrectAST()
+        {
+            var source = @"my int m()
+                           {
+                               while(1) 
+                               {
+                                   if(1)
+                                   {
+                                       for(1; 1; 1)
+                                       {
+                                       }
+                                       return 1;
+                                   }
+                                   else
+                                   {
+                                       if(1)
+                                       {
+                                            break;
+                                       }
+                                   }
+                               }
+                               return;
+                           }";
+
+            var parser = ParserFactory.FromString(source);
+            var b = parser.GetSyntax();
+
+            b.ToString();
+        }
+
+        [TestMethod]
         public void GetSyntax_WithFor_ShouldReturnTheCorrectAST()
         {
             var source = "my void m() { for(int i = 0; i < 10; i++) { } }";

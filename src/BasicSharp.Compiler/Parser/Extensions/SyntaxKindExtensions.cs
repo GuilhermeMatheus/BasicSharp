@@ -87,13 +87,17 @@ namespace BasicSharp.Compiler.Parser.Extensions
             }
         }
     
-        public static bool IsNumericLiteral(this SyntaxKind syntaxKind)
+        public static bool IsLiteral(this SyntaxKind syntaxKind)
         {
             switch (syntaxKind)
             {
+                case SyntaxKind.CharLiteral:
+                case SyntaxKind.StringLiteral:
                 case SyntaxKind.ByteLiteral:
                 case SyntaxKind.DoubleLiteral:
                 case SyntaxKind.IntegerLiteral:
+                case SyntaxKind.TrueKeyword:
+                case SyntaxKind.FalseKeyword:
                     return true;
                 default:
                     return false;

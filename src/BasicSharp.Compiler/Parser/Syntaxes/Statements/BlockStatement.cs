@@ -40,6 +40,10 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
         public override IEnumerable GetChilds()
         {
             yield return OpenBraceToken;
+            
+            foreach (var item in statements)
+                    yield return item;
+
             yield return CloseBraceToken;
         }
     }
