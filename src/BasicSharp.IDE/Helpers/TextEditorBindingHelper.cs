@@ -8,7 +8,7 @@ using System.Windows;
 
 namespace BasicSharp.IDE.Helpers
 {
-    public class TextEditorBindingHelper
+    public class TextEditorBindingHelper 
     {
         #region Dependency Properties
         public static readonly DependencyProperty TextProperty = DependencyProperty.RegisterAttached("Text",
