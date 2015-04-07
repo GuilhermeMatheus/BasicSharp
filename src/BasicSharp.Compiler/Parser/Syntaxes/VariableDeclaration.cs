@@ -12,15 +12,15 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 {
     public class VariableDeclaration : SyntaxNode 
     {
-        List<VariableDeclarator> declarators = new List<VariableDeclarator>();
+        List<VariableAssignmentExpression> declarators = new List<VariableAssignmentExpression>();
 
         public PredefinedType Type { get; internal set; }
-        public ReadOnlyCollection<VariableDeclarator> Declarators
+        public ReadOnlyCollection<VariableAssignmentExpression> Declarators
         {
-            get { return new ReadOnlyCollection<VariableDeclarator>(declarators); }
+            get { return new ReadOnlyCollection<VariableAssignmentExpression>(declarators); }
         }
 
-        public void AddDeclarator(VariableDeclarator declarator)
+        public void AddDeclarator(VariableAssignmentExpression declarator)
         {
             this.declarators.Add(declarator);
         }
@@ -35,7 +35,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
                     yield return item;
         }
 
-        public static VariableDeclaration WithDeclarator(VariableDeclarator declarator)
+        public static VariableDeclaration WithDeclarator(VariableAssignmentExpression declarator)
         {
             var result = new VariableDeclaration();
             result.AddDeclarator(declarator);

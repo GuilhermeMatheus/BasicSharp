@@ -9,7 +9,7 @@ using System.Collections;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
-    public class BinaryExpression : Expression
+    public abstract class BinaryExpression : Expression
     {
         public Expression LeftSide { get; internal set; }
         public TokenInfo OperatorToken { get; set; }

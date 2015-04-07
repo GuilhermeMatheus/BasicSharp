@@ -55,7 +55,7 @@ namespace BasicSharp.Compiler.Parser.Extensions
             return false;
         }
 
-        public static bool IsLogicalOperator(this SyntaxKind syntaxKind)
+        public static bool IsComparatorOperator(this SyntaxKind syntaxKind)
         {
             switch (syntaxKind)
             {
@@ -64,8 +64,6 @@ namespace BasicSharp.Compiler.Parser.Extensions
                 case SyntaxKind.MinorEqualsOperator:
                 case SyntaxKind.MajorOperator:
                 case SyntaxKind.MajorEqualsOperator:
-                case SyntaxKind.AndOperator:
-                case SyntaxKind.OrOperator:
                     return true;
                 default:
                     return false;
@@ -98,6 +96,7 @@ namespace BasicSharp.Compiler.Parser.Extensions
                 case SyntaxKind.IntegerLiteral:
                 case SyntaxKind.TrueKeyword:
                 case SyntaxKind.FalseKeyword:
+                case SyntaxKind.NullKeyword:
                     return true;
                 default:
                     return false;

@@ -223,7 +223,7 @@ namespace BasicSharp.Compiler.Parser
 
             variableDeclaration.AddTrivia(currentToken());
             moveNextToken();
-            VariableDeclarator varDecl;
+            VariableAssignmentExpression varDecl;
             while ((varDecl = getVariableDeclarator()) != null)
             {
                 dumpTrivia(variableDeclaration);
@@ -244,41 +244,7 @@ namespace BasicSharp.Compiler.Parser
             moveNextToken();
             return result;
         }
-        VariableDeclarator getVariableDeclarator()
-        {
-            var current = currentToken();
-
-            if (current.Kind != SyntaxKind.Identifier)
-                return null;
-
-            moveNextToken();
-            return getVariableDeclarator(current);
-        }
-
-        VariableDeclarator getVariableDeclarator(TokenInfo identifier)
-        {
-            var current = currentToken();
-
-            if (current.Kind.IsIn(SyntaxKind.CommaToken, SyntaxKind.SemicolonToken))
-                return new VariableDeclarator { Identifier = identifier };
-
-            if (current.Kind == SyntaxKind.EqualsToken)
-            {
-                moveNextToken();
-                return new VariableDeclarator { Identifier = identifier, Assignment = getAssignmentExpression(current) };
-            }
-            handleError();
-            return null;
-        }
-        AssignmentExpression getAssignmentExpression(TokenInfo assignmentOperatorInfo)
-        {
-
-            return new AssignmentExpression
-            {
-                OperatorToken = assignmentOperatorInfo,
-                Expression = getExpression()
-            };
-        }
+        
 
         ParameterList getParameterList()
         {
@@ -368,7 +334,7 @@ namespace BasicSharp.Compiler.Parser
         Statement getStatement()
         {
             return getLocalVariableDeclarationStatement() ??
-                   getMethodInvocationStatement() ??
+                   getMethodInvocationOrLocalVariableAssignmentStatement() ??
                    getReturnStatement() ??
                    getBreakStatement() ??
                    getIfStatement() ??
@@ -376,25 +342,56 @@ namespace BasicSharp.Compiler.Parser
                    (Statement)getWhileStatement();
         }
 
-        MethodInvocationStatement getMethodInvocationStatement()
+        Statement getMethodInvocationOrLocalVariableAssignmentStatement()
         {
-            var methodInvocation = getMethodInvocationExpression();
-            if (methodInvocation == null)
+            var identifier = currentToken();
+            
+            if (identifier.Kind != SyntaxKind.Identifier)
                 return null;
 
-            var semicolon = currentToken();
-            if (semicolon.Kind != SyntaxKind.SemicolonToken)
+            var curr = moveNextToken();
+            if (curr.Kind == SyntaxKind.OpenParenToken)
+            {
+                moveNextToken();
+                var methodInvocation = getMethodInvocationExpression(identifier, curr);
+
+                var semicolon = currentToken();
+                if (semicolon.Kind != SyntaxKind.SemicolonToken)
+                    handleError();
+
+                var methodResult = new MethodInvocationStatement
+                {
+                    MethodInvocation = methodInvocation,
+                    SemicolonToken = curr
+                };
+
+                dumpTrivia(methodResult);
+                moveNextToken();
+
+                return methodResult;
+            }
+
+            var assignmentResult = getLocalVariableAssignmentStatementWith(identifier);
+
+            dumpTrivia(assignmentResult);
+
+            return assignmentResult;
+        }
+        LocalVariableAssignmentStatement getLocalVariableAssignmentStatementWith(TokenInfo identifier)
+        {
+            var declarator = getVariableDeclarator(identifier);
+            if (declarator == null)
+                return null;
+
+            var result = new LocalVariableAssignmentStatement { Declarator = declarator };
+
+            if (currentToken().Kind != SyntaxKind.SemicolonToken)
                 handleError();
 
-            moveNextToken();
-            var result = new MethodInvocationStatement
-            {
-                MethodInvocation = methodInvocation,
-                SemicolonToken = semicolon
-            };
-
+            result.SemicolonToken = currentToken();
             dumpTrivia(result);
 
+            moveNextToken();
             return result;
         }
         ReturnStatement getReturnStatement()
@@ -594,7 +591,7 @@ namespace BasicSharp.Compiler.Parser
 
             variableDeclaration.AddTrivia(currentToken());
             moveNextToken();
-            VariableDeclarator varDecl;
+            VariableAssignmentExpression varDecl;
             while ((varDecl = getVariableDeclarator()) != null)
             {
                 dumpTrivia(variableDeclaration);
@@ -622,6 +619,8 @@ namespace BasicSharp.Compiler.Parser
         {
             Expression root;
 
+            return getBinaryExpression();
+
             //if((root = getBooleanExpression()) != null)
             //    return root;
 
@@ -629,6 +628,80 @@ namespace BasicSharp.Compiler.Parser
                 return root;
 
             return null;
+        }
+
+        Expression getBinaryExpression()
+        {
+            var arithmeticExpression = getArithmeticBinaryExpression();
+            if (arithmeticExpression == null)
+                return null;
+
+            return getLogicalOrExpression(arithmeticExpression);
+        }
+
+        Expression getLogicalOrExpression(Expression left)
+        {
+            var op = currentToken();
+            if (op.Kind != SyntaxKind.OrOperator)
+                return getLogicalAndExpression(left);
+
+            moveNextToken();
+
+            return new LogicalOrExpression
+            {
+                LeftSide = left,
+                OperatorToken = op,
+                RightSide = getExpression()
+            };
+        }
+        Expression getLogicalAndExpression(Expression left)
+        {
+            var op = currentToken();
+            if (op.Kind != SyntaxKind.AndOperator)
+                return getComparatorExpression(left);
+
+            moveNextToken();
+
+            return new LogicalAndExpression
+            {
+                LeftSide = left,
+                OperatorToken = op,
+                RightSide = getExpression()
+            };
+        }
+        Expression getComparatorExpression(Expression left)
+        {
+            BinaryExpression result;
+            var op = currentToken();
+
+            switch (op.Kind)
+            {
+                case SyntaxKind.EqualsEqualsOperator:
+                    result = new EqualsEqualsExpression();
+                    break;
+                case SyntaxKind.MinorOperator:
+                    result = new LogicalLessThanExpression();
+                    break;
+                case SyntaxKind.MinorEqualsOperator:
+                    result = new LogicalLessOrEqualThanExpression();
+                    break;
+                case SyntaxKind.MajorOperator:
+                    result = new LogicalGreaterThanExpression();
+                    break;
+                case SyntaxKind.MajorEqualsOperator:
+                    result = new LogicalGreaterOrEqualThanExpression();
+                    break;
+                default:
+                    return left;
+            }
+
+            moveNextToken();
+
+            result.LeftSide = left;
+            result.OperatorToken = op;
+            result.RightSide = getExpression();
+
+            return result;
         }
 
         //UNDONE: Precedence is not respected
@@ -651,56 +724,12 @@ namespace BasicSharp.Compiler.Parser
 
             return root;
         }
-
-        Expression getBooleanExpression()
-        {
-            var result = getArithmeticBinaryExpression() ?? getBooleanLiteralOrAccessor();
-            if (result == null)
-                return null;
-
-            TokenInfo c;
-            while ((c = currentToken()).Kind != SyntaxKind.SemicolonToken && c.Kind != SyntaxKind.None)
-            {
-                if (c.Kind.IsLogicalOperator())
-                {
-                    moveNextToken();
-                    var rightSide = getArithmeticBinaryExpression() ?? getBooleanLiteralOrAccessor();
-
-                    if (rightSide == null)
-                        handleError();
-
-                    result = new BinaryExpression
-                    {
-                        LeftSide = result,
-                        OperatorToken = c,
-                        RightSide = rightSide
-                    };
-                }
-            }
-
-            return result;
-        }
-        Expression getBooleanLiteralOrAccessor()
-        {
-            Expression result;
-
-            var tknCurrent = currentToken();
-            if (tknCurrent.Kind.IsIn(SyntaxKind.FalseKeyword, SyntaxKind.TrueKeyword))
-            {
-                result = new LiteralExpression { Value = tknCurrent };
-                moveNextToken();
-            }
-            else
-                result = getMethodInvocationOrAccessorExpression();
-
-            return result;
-        }
-
         Expression getUnaryExpression()
         {
-            return getLiteralExpression() ?? getMethodInvocationOrAccessorExpression() ?? getSignedUnaryExpression();
+            return getLiteralExpression() ??
+                   getMethodInvocationOrAccessorOrDeclaratorExpression() ??
+                   getSignedUnaryExpression();
         }
-
         ParenthesedExpression getParenthesedExpression()
         {
             var openParen = currentToken();
@@ -725,8 +754,7 @@ namespace BasicSharp.Compiler.Parser
                 CloseParenToken = closeParen
             };
         }
-
-        Expression getMethodInvocationOrAccessorExpression()
+        Expression getMethodInvocationOrAccessorOrDeclaratorExpression()
         {
             var identifier = currentToken();
             if (identifier.Kind != SyntaxKind.Identifier)
@@ -757,10 +785,47 @@ namespace BasicSharp.Compiler.Parser
                 result.BracketedArgument = bracketed;
                 dumpTrivia(bracketed);
             }
+            else if (curr.Kind == SyntaxKind.EqualsToken)
+            {
+                moveNextToken();
+                return new VariableAssignmentExpression { Identifier = identifier, Assignment = getAssignmentExpression(curr) };
+            }
             
             return result;
         }
+        VariableAssignmentExpression getVariableDeclarator()
+        {
+            var current = currentToken();
 
+            if (current.Kind != SyntaxKind.Identifier)
+                return null;
+
+            moveNextToken();
+            return getVariableDeclarator(current);
+        }
+        VariableAssignmentExpression getVariableDeclarator(TokenInfo identifier)
+        {
+            var current = currentToken();
+
+            if (current.Kind.IsIn(SyntaxKind.CommaToken, SyntaxKind.SemicolonToken))
+                return new VariableAssignmentExpression { Identifier = identifier };
+
+            if (current.Kind == SyntaxKind.EqualsToken)
+            {
+                moveNextToken();
+                return new VariableAssignmentExpression { Identifier = identifier, Assignment = getAssignmentExpression(current) };
+            }
+            handleError();
+            return null;
+        }
+        AssignmentExpression getAssignmentExpression(TokenInfo assignmentOperatorInfo)
+        {
+            return new AssignmentExpression
+            {
+                OperatorToken = assignmentOperatorInfo,
+                Expression = getExpression()
+            };
+        }
         MethodInvocationExpression getMethodInvocationExpression(TokenInfo identifier = null, TokenInfo openParen = null)
         {
             if (identifier == null && openParen == null)
@@ -806,7 +871,6 @@ namespace BasicSharp.Compiler.Parser
 
             return result;
         }
-        
         Expression getAdditiveExpression(Expression leftSide)
         {
             leftSide = leftSide ?? getMultiplicativeExpression(null);
@@ -824,14 +888,19 @@ namespace BasicSharp.Compiler.Parser
 
             var rightSide = getMultiplicativeExpression(null);
 
-            return new BinaryExpression
-            {
-                LeftSide = leftSide,
-                OperatorToken = op,
-                RightSide = rightSide
-            };
+            if (op.Kind == SyntaxKind.PlusToken)
+                return new AddExpression {
+                    LeftSide = leftSide,
+                    OperatorToken = op,
+                    RightSide = rightSide
+                };
+            else
+                return new SubtractExpression {
+                    LeftSide = leftSide,
+                    OperatorToken = op,
+                    RightSide = rightSide
+                };
         }
-
         Expression getMultiplicativeExpression(Expression leftSide)
         {
             leftSide = leftSide ?? getModExpression(null);
@@ -850,14 +919,21 @@ namespace BasicSharp.Compiler.Parser
 
             var rightSide = getModExpression(null);
 
-            return new BinaryExpression
-            {
-                LeftSide = leftSide,
-                OperatorToken = op,
-                RightSide = rightSide
-            };
+            if (op.Kind == SyntaxKind.AsteriskToken)
+                return new MultiplyExpression
+                {
+                    LeftSide = leftSide,
+                    OperatorToken = op,
+                    RightSide = rightSide
+                };
+            else
+                return new DivideExpression
+                {
+                    LeftSide = leftSide,
+                    OperatorToken = op,
+                    RightSide = rightSide
+                };
         }
-
         Expression getModExpression(Expression leftSide)
         {
             leftSide = leftSide ?? getUnaryExpression();
@@ -876,14 +952,13 @@ namespace BasicSharp.Compiler.Parser
 
             var rightSide = getModExpression(null);
 
-            return new BinaryExpression
+            return new ModExpression
             {
                 LeftSide = leftSide,
                 OperatorToken = op,
                 RightSide = rightSide
             };
         }
-
         Expression getSignedUnaryExpression()
         {
             var signal = currentToken();
@@ -891,12 +966,11 @@ namespace BasicSharp.Compiler.Parser
             if (signal.Kind.IsIn(SyntaxKind.MinusToken, SyntaxKind.PlusToken))
             {
                 moveNextToken();
-                return new UnaryExpression { SignalToken = signal, Expression = getLiteralExpression() ?? getMethodInvocationOrAccessorExpression() ?? getParenthesedExpression() as Expression };
+                return new UnaryExpression { SignalToken = signal, Expression = getLiteralExpression() ?? getMethodInvocationOrAccessorOrDeclaratorExpression() ?? getParenthesedExpression() as Expression };
             }
 
-            return getLiteralExpression() ?? getMethodInvocationOrAccessorExpression() ?? getParenthesedExpression() as Expression;
+            return getLiteralExpression() ?? getMethodInvocationOrAccessorOrDeclaratorExpression() ?? getParenthesedExpression() as Expression;
         }
-
         LiteralExpression getLiteralExpression()
         {
             var value = currentToken();

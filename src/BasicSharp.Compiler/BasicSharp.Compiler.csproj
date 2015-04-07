@@ -48,7 +48,10 @@
     <Compile Include="Lexer\SyntacticException.cs" />
     <Compile Include="Lexer\Token\SyntaxKind.cs" />
     <Compile Include="Lexer\Token\TokenInfo.cs" />
+    <Compile Include="Parser\LocalVariableAssignmentStatement.cs" />
+    <Compile Include="Parser\Syntaxes\Expressions\ArithmeticExpressions.cs" />
     <Compile Include="Parser\Syntaxes\Expressions\BracketedArgument.cs" />
+    <Compile Include="Parser\Syntaxes\Expressions\LogicalExpressions.cs" />
     <Compile Include="Parser\Syntaxes\Statements\MethodInvocationStatement.cs" />
     <Compile Include="Parser\Syntaxes\Statements\BreakStatement.cs" />
     <Compile Include="Parser\Extensions\ExpressionExtensions.cs" />
@@ -84,7 +87,7 @@
     <Compile Include="Parser\Syntaxes\ParameterList.cs" />
     <Compile Include="Parser\Syntaxes\SyntaxNode.cs" />
     <Compile Include="Parser\Syntaxes\VariableDeclaration.cs" />
-    <Compile Include="Parser\Syntaxes\VariableDeclarator.cs" />
+    <Compile Include="Parser\Syntaxes\Expressions\VariableDeclaratorExpression.cs" />
     <Compile Include="Parser\Syntaxes\Expressions\UnaryExpression.cs" />
     <Compile Include="Parser\Syntaxes\Statements\WhileStatement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -94,6 +97,10 @@
       <Project>{15c4fdb5-7ed4-48c4-9d26-dda3e9b1c7b0}</Project>
       <Name>BasicSharp.Utils</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Analizer\" />
+    <Folder Include="ILEmitter\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -8,7 +8,7 @@ using System.Collections;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
-    public class VariableDeclarator : SyntaxNode
+    public class VariableAssignmentExpression : Expression
     {
         public TokenInfo Identifier { get; set; }
         public AssignmentExpression Assignment { get; set; }
