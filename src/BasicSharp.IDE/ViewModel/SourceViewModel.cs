@@ -11,6 +11,13 @@ using System.Threading.Tasks;
 
 namespace BasicSharp.IDE.ViewModel
 {
+    public enum Status
+    {
+        CompilationException,
+        CompilationSuccess
+    }
+
+
     public class SourceViewModel : ViewModelBase
     {
         public string FileAddress { get; set; }
@@ -68,6 +75,18 @@ namespace BasicSharp.IDE.ViewModel
             }
         }
 
+        private Status status;
+        public Status Status
+        {
+            get { return status; }
+            set
+            {
+                status = value;
+                OnPropertyChanged();
+            }
+        }
+
+
         public SourceViewModel()
         {
             this.Tokens = new ObservableCollection<TokenInfo>();
@@ -81,7 +100,15 @@ namespace BasicSharp.IDE.ViewModel
 
             Tokens = new ObservableCollection<TokenInfo>(tokens);
 
-            Syntax = new List<SyntaxNode> { parser.GetSyntax() };
+            try
+            {
+                Syntax = new List<SyntaxNode> { parser.GetSyntax() };
+                this.Status = Status.CompilationSuccess;
+            }
+            catch 
+            {
+                this.Status = Status.CompilationException;
+            }
         }
     }
 }

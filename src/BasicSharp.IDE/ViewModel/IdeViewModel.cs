@@ -1,5 +1,6 @@
 ﻿using BasicSharp.Compiler.Lexer;
 using BasicSharp.Compiler.Parser.Syntaxes;
+using BasicSharp.IDE.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,5 +50,10 @@ namespace BasicSharp.IDE.ViewModel
             this.CurrentSource = new SourceViewModel { FileName = "Module1.bs" };
         }
 
+
+        #region Comandos
+        public Command NovoProjetoCommand { get { return null; } }
+        public Command AbrirProjetoCommand { get { return null; } }
+        #endregion
     }
 }
