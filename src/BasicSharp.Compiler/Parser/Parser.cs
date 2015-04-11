@@ -74,9 +74,7 @@ namespace BasicSharp.Compiler.Parser
             dumpTrivia(result);
 
             if (module == null)
-            {
                 handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.ModuleKeyword));
-            }
 
             result.Module = module;
 
@@ -158,11 +156,11 @@ namespace BasicSharp.Compiler.Parser
             moveNextToken();
             var type = getPredefinedType();
             if (type == null)
-                handleError(); //Type esperado, etc etc
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(currentToken().Line, currentToken().EndColumn, "predefined type"));
 
             var identifier = currentToken();
             if (identifier.Kind != SyntaxKind.Identifier)
-                handleError(); //Type esperado, etc etc
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(currentToken().Line, currentToken().EndColumn, SyntaxKind.Identifier));
 
             moveNextToken();
             var parameterList = getParameterList();
@@ -1032,6 +1030,9 @@ namespace BasicSharp.Compiler.Parser
         //TODO: Implements Error Handler
         void handleError(SyntacticException error = null)
         {
+            if (error != null)
+                Console.WriteLine(error.Message);
+
             _syntacticErrors.Add(error);
         }
     }
