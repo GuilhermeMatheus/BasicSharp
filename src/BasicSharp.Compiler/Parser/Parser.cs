@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BasicSharp.Compiler.Parser.Extensions;
 using lxr = BasicSharp.Compiler.Lexer;
+using System.Collections.ObjectModel;
 
 namespace BasicSharp.Compiler.Parser
 {
@@ -15,6 +16,12 @@ namespace BasicSharp.Compiler.Parser
         readonly lxr.Lexer lexer;
         readonly IEnumerator<TokenInfo> enumerator;
         readonly Queue<TokenInfo> triviaBuffer;
+
+        List<SyntacticException> _syntacticErrors;
+        public ReadOnlyCollection<SyntacticException> SyntacticErrors
+        {
+            get { return _syntacticErrors.AsReadOnly(); }
+        }
 
         public Parser(lxr.Lexer lexer) 
             : this(lexer.GetTokens().GetEnumerator())
@@ -26,6 +33,7 @@ namespace BasicSharp.Compiler.Parser
         {
             this.enumerator = enumerator;
             this.triviaBuffer = new Queue<TokenInfo>();
+            this._syntacticErrors = new List<SyntacticException>();
         }
 
         public SyntaxNode GetSyntax()
@@ -66,7 +74,9 @@ namespace BasicSharp.Compiler.Parser
             dumpTrivia(result);
 
             if (module == null)
-                handleError();
+            {
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.ModuleKeyword));
+            }
 
             result.Module = module;
 
@@ -1020,9 +1030,9 @@ namespace BasicSharp.Compiler.Parser
         }
 
         //TODO: Implements Error Handler
-        void handleError()
+        void handleError(SyntacticException error = null)
         {
-            throw new Exception();
+            _syntacticErrors.Add(error);
         }
     }
 }

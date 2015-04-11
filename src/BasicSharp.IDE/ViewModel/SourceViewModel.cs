@@ -100,12 +100,12 @@ namespace BasicSharp.IDE.ViewModel
 
             Tokens = new ObservableCollection<TokenInfo>(tokens);
 
-            try
+            //try
             {
                 Syntax = new List<SyntaxNode> { parser.GetSyntax() };
                 this.Status = Status.CompilationSuccess;
             }
-            catch 
+            //catch 
             {
                 this.Status = Status.CompilationException;
             }

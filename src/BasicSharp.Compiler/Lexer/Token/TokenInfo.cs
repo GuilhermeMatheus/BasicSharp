@@ -11,8 +11,13 @@ namespace BasicSharp.Compiler.Lexer
     public class TokenInfo
     {
         public SyntaxKind Kind { get; set; }
+        
+        public int EndColumn { get; set; }
+        public int Line { get; set; }
+
         public int Begin { get; set; }
         public int End { get; set; }
+        
         public bool IsMalformedToken { get; set; }
 
         public string StringValue { get; set; }

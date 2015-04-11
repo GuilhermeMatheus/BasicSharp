@@ -14,10 +14,10 @@ namespace BasicSharp.Compiler.Lexer
     {
         readonly SlidingText text;
 
-        List<SyntacticException> _syntacticErrors;
-        public ReadOnlyCollection<SyntacticException> SyntacticErrors
+        List<LexicalException> _lexicalErrors;
+        public ReadOnlyCollection<LexicalException> LexicalErrors
         {
-            get { return _syntacticErrors.AsReadOnly(); }
+            get { return _lexicalErrors.AsReadOnly(); }
         }
 
         public Lexer(Stream sourceStream) : this(new SlidingText(sourceStream)) { }
@@ -25,7 +25,7 @@ namespace BasicSharp.Compiler.Lexer
         public Lexer(SlidingText text)
         {
             this.text = text;
-            this._syntacticErrors = new List<SyntacticException>();
+            this._lexicalErrors = new List<LexicalException>();
         }
 
         public IEnumerable<TokenInfo> GetTokens()
@@ -37,10 +37,10 @@ namespace BasicSharp.Compiler.Lexer
                 switch (ch)
                 {
                     case '"':
-                        yield return scanStringLiteral();
+                        yield return updateCurrentLineColumn(scanStringLiteral());
                         continue;
                     case '\'':
-                        yield return scanCharLiteral();
+                        yield return updateCurrentLineColumn(scanCharLiteral());
                         continue;
                     case '0':
                     case '1':
@@ -52,7 +52,7 @@ namespace BasicSharp.Compiler.Lexer
                     case '7':
                     case '8':
                     case '9':
-                        yield return scanNumericLiteral();
+                        yield return updateCurrentLineColumn(scanNumericLiteral());
                         continue;
                     case 'a':
                     case 'b':
@@ -107,14 +107,14 @@ namespace BasicSharp.Compiler.Lexer
                     case 'Y':
                     case 'Z':
                     case '_':
-                        yield return scanIdentifierOrKeyword();
+                        yield return updateCurrentLineColumn(scanIdentifierOrKeyword());
                         continue;
                     case '/':
                     case '\t':
                     case '\n':
                     case '\r':
                     case ' ':
-                        yield return scanTrivia();
+                        yield return updateCurrentLineColumn(scanTrivia());
                         continue;
                     case '=':
                     case '<':
@@ -126,7 +126,7 @@ namespace BasicSharp.Compiler.Lexer
                     case '\\':
                     case '|':
                     case '&':
-                        yield return scanAssignmentOrRelationalOperator();
+                        yield return updateCurrentLineColumn(scanAssignmentOrRelationalOperator());
                         continue;
                     case '[':
                     case ']':
@@ -137,21 +137,29 @@ namespace BasicSharp.Compiler.Lexer
                     case ',':
                     case '.':
                     case ';':
-                        yield return new TokenInfo
-                        {
-                            Begin = text.Offset,
-                            End = text.Offset + 1,
-                            StringValue = text.Peek().ToString(),
-                            Kind = getSyntaxKind(text.Next())
-                        };
+                        yield return updateCurrentLineColumn(new TokenInfo
+                         {
+                             Begin = text.Offset,
+                             End = text.Offset + 1,
+                             StringValue = text.Peek().ToString(),
+                             Kind = getSyntaxKind(text.Next())
+                         });
                         continue;
                     case SlidingText.INVALID_CHAR:
                         yield break;
                     default:
-                        handleSyntacticError(SyntacticExceptions.SymbolNotExpected(text, ch.ToString(), null, new string[] { }), null);
+                        handleSyntacticError(LexicalExceptions.SymbolNotExpected(text, ch.ToString(), null, new string[] { }), null);
                         continue;
                 }
             }
+        }
+
+        TokenInfo updateCurrentLineColumn(TokenInfo tokenInfo)
+        {
+            tokenInfo.Line = text.Line;
+            tokenInfo.EndColumn = text.Column;
+
+            return tokenInfo;
         }
 
         #region Scan methods
@@ -387,7 +395,7 @@ namespace BasicSharp.Compiler.Lexer
                 while (!(c = text.Peek()).IsLineBreak() && c != SlidingText.INVALID_CHAR)
                     stringValue += text.Next();
             else
-                handleSyntacticError(SyntacticExceptions.SymbolNotExpected(text, text.Peek(1).ToString(), ret, "/"), ret);
+                handleSyntacticError(LexicalExceptions.SymbolNotExpected(text, text.Peek(1).ToString(), ret, "/"), ret);
 
             ret.StringValue = stringValue;
             ret.End = ret.Begin + stringValue.Length;
@@ -407,7 +415,7 @@ namespace BasicSharp.Compiler.Lexer
                 {
                     if (c.IsLineBreak())
                     {
-                        handleSyntacticError(SyntacticExceptions.SymbolNotExpected(text, "line ending", ret, "\""), ret);
+                        handleSyntacticError(LexicalExceptions.SymbolNotExpected(text, "line ending", ret, "\""), ret);
                         break;
                     }
                     stringValue += text.Next();
@@ -434,7 +442,7 @@ namespace BasicSharp.Compiler.Lexer
                 {
                     if (c.IsLineBreak())
                     {
-                        handleSyntacticError(SyntacticExceptions.SymbolNotExpected(text, "line ending", ret, "'"), ret);
+                        handleSyntacticError(LexicalExceptions.SymbolNotExpected(text, "line ending", ret, "'"), ret);
                         break;
                     }
                     stringValue += text.Next();
@@ -445,9 +453,9 @@ namespace BasicSharp.Compiler.Lexer
                 return null;
 
             if (stringValue.Length < 3)
-                handleSyntacticError(SyntacticExceptions.EmptyCharLiteral(text, ret), ret);
+                handleSyntacticError(LexicalExceptions.EmptyCharLiteral(text, ret), ret);
             if (stringValue.Length > 3)
-                handleSyntacticError(SyntacticExceptions.TooManyCharactersInCharLiteral(text, ret), ret);
+                handleSyntacticError(LexicalExceptions.TooManyCharactersInCharLiteral(text, ret), ret);
 
             ret.StringValue = stringValue;
             ret.End = ret.Begin + stringValue.Length;
@@ -474,7 +482,7 @@ namespace BasicSharp.Compiler.Lexer
                 doublePlace = scanIntegerLiteral();
                 if (doublePlace == null)
                 {
-                    handleSyntacticError(SyntacticExceptions.SymbolNotExpected(text, text.Peek().ToString(), integerToken, SyntaxKind.IntegerLiteral), integerToken);
+                    handleSyntacticError(LexicalExceptions.SymbolNotExpected(text, text.Peek().ToString(), integerToken, SyntaxKind.IntegerLiteral), integerToken);
                     return integerToken;
                 }
             }
@@ -499,7 +507,7 @@ namespace BasicSharp.Compiler.Lexer
                     stringValue += text.Next();
                 else
                 {
-                    handleSyntacticError(SyntacticExceptions.SymbolNotExpected(text, text.Peek().ToString(), ret, "0", "1"), ret);
+                    handleSyntacticError(LexicalExceptions.SymbolNotExpected(text, text.Peek().ToString(), ret, "0", "1"), ret);
                     break;
                 }
             }
@@ -541,12 +549,12 @@ namespace BasicSharp.Compiler.Lexer
         }
         #endregion
 
-        void handleSyntacticError(SyntacticException error, TokenInfo currentToken)
+        void handleSyntacticError(LexicalException error, TokenInfo currentToken)
         {
             if (currentToken != null)
                 currentToken.IsMalformedToken = true;
             
-            _syntacticErrors.Add(error);
+            _lexicalErrors.Add(error);
             
             text.Next();
         }

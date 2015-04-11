@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BasicSharp.Compiler.Lexer
 {
-    public class SyntacticException : Exception
+    public class LexicalException : Exception
     {
         public SlidingText TextSource { get; set; }
         public string Symbol { get; set; }
@@ -14,6 +14,6 @@ namespace BasicSharp.Compiler.Lexer
         public SyntaxKind[] ExpectedSyntaxes { get; set; }
         public string[] ExpectedStrings { get; set; }
 
-        public SyntacticException(string message) : base(message) { }
+        public LexicalException(string message) : base(message) { }
     }
 }
