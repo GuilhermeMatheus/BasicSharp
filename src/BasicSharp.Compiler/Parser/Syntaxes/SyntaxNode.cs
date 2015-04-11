@@ -59,7 +59,6 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             }
         }
 
-
         public string DisplayMember
         {
             get { return GetType().Name; }
