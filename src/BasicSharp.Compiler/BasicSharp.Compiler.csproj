@@ -39,10 +39,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Analizer\AnalysisResult.cs" />
-    <Compile Include="Analizer\Analyzer.cs" />
-    <Compile Include="Analizer\AnalyzerManager.cs" />
-    <Compile Include="Analizer\CompilationBag.cs" />
+    <Compile Include="Analyzer\AnalysisResult.cs" />
+    <Compile Include="Analyzer\CodeInfo.cs" />
+    <Compile Include="Analyzer\CodeLens.cs" />
+    <Compile Include="Analyzer\Specialized\AnalysisResults.cs" />
+    <Compile Include="Analyzer\Specialized\CompilationUnitAnalyzer.cs" />
+    <Compile Include="Analyzer\Specialized\ExpressionAnalyzer.cs" />
+    <Compile Include="Analyzer\Specialized\FieldDeclarationAnalyzer.cs" />
+    <Compile Include="Analyzer\Specialized\ImplementsDirectiveAnalyzer.cs" />
+    <Compile Include="Analyzer\Specialized\ModuleDeclarationAnalyzer.cs" />
+    <Compile Include="Analyzer\Specialized\SpecializedAnalyzer.cs" />
+    <Compile Include="Analyzer\Specialized\AnalyzerFactory.cs" />
+    <Compile Include="Analyzer\AnalyzerManager.cs" />
+    <Compile Include="Analyzer\CompilationBag.cs" />
+    <Compile Include="Analyzer\Specialized\MethodDeclarationAnalyzer.cs" />
+    <Compile Include="Analyzer\VariableBag.cs" />
     <Compile Include="Lexer\Extensions\LexicalExceptions.cs" />
     <Compile Include="Lexer\Extensions\TokenInfoExtensions.cs" />
     <Compile Include="Lexer\Lexer.cs" />
@@ -110,6 +121,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Analyzer\Extensions\" />
     <Folder Include="ILEmitter\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

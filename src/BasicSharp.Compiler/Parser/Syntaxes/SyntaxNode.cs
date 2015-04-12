@@ -15,6 +15,8 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
     {
         List<TokenInfo> trivias = new List<TokenInfo>();
 
+        public SyntaxNode Parent { get; protected set; }
+
         public ReadOnlyCollection<TokenInfo> Trivias
         {
             get { return new ReadOnlyCollection<TokenInfo>(trivias); }

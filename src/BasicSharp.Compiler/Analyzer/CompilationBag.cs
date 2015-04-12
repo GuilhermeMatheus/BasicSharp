@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using BasicSharp.Compiler.Parser.Extensions;
 using System.Reflection;
 
-namespace BasicSharp.Compiler.Analizer
+namespace BasicSharp.Compiler.Analyzer
 {
     public class CompilationBag
     {
@@ -19,6 +19,7 @@ namespace BasicSharp.Compiler.Analizer
 
         List<MethodStub> methodStubs = new List<MethodStub>();
         List<Variable> fields = new List<Variable>();
+        List<Assembly> assemblies = new List<Assembly>();
 
         public CompilationUnit CompilationUnit { get; private set; }
         public Project Project { get; private set; }
@@ -41,13 +42,58 @@ namespace BasicSharp.Compiler.Analizer
 
         void initialize()
         {
+            loadAssemblies();
             loadInternalMethodStubs();
             loadExternalMethodStubs();
 
             loadField();
         }
 
+
+        //1. Verifica se a classe existe
+        public bool ContainsClass(string fullClassName)
+        {
+            return this.assemblies.SelectMany(x => x.GetTypes())
+                                  .Select(t => t.FullName)
+                                  .Any(n => n.Equals(fullClassName));
+        }
+        //2. Verifica os assemblies que contém a classe
+        public IEnumerable<Assembly> GetAssembliesForClass(string fullClassName)
+        {
+            var result = from ass in assemblies
+                         let tuple = new { ass, types = ass.GetTypes() }
+                         where tuple.types.Any(t => t.FullName.Equals(fullClassName))
+                         select tuple.ass;
+            
+            return result;
+        }
+        //3. Verifica se a classe é Sealed e Abstract
+        public bool IsValidClass(string fullClassName)
+        {
+            var src = GetAssembliesForClass(fullClassName);
+            
+            if (!src.Any())
+                return false;
+
+            if (src.Count() > 1)
+                return false;
+
+            var _class = from c in src.First().GetTypes()
+                         where c.FullName.Equals(fullClassName) &&
+                                                     c.IsSealed && 
+                                                   c.IsAbstract
+                             select c;
+
+            //Só poderá existir um tipo com estes atributos
+            return _class.Any();
+        }
+
         #region MethodStubs
+        void loadAssemblies()
+        {
+            foreach (var item in Project.AssembliesAddress)
+                assemblies.Add(Assembly.LoadFrom(item));
+        }
         void loadInternalMethodStubs()
         {
             var internalMethods = from item in CompilationUnit.Module.Members
@@ -68,10 +114,8 @@ namespace BasicSharp.Compiler.Analizer
         }
         void loadExternalMethodStubs()
         {
-            foreach (var item in Project.AssembliesAddress)
+            foreach (var ass in assemblies)
             {
-                var ass = Assembly.LoadFrom(item);
-
                 var staticClasses = from c in ass.GetTypes()
                                     where c.IsSealed && c.IsAbstract
                                     select c;
@@ -122,5 +166,7 @@ namespace BasicSharp.Compiler.Analizer
 
             this.fields.AddRange(result);
         }
+    
+    
     }
 }

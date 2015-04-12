@@ -23,7 +23,6 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             get { return Modifier.Kind == SyntaxKind.EverybodyKeyword; }
         }
 
-
         public TokenInfo Modifier { get; internal set; }
         public PredefinedType ReturnType { get; internal set; }
         public TokenInfo Identifier { get; internal set; }
