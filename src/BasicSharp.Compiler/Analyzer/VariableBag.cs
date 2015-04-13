@@ -35,5 +35,12 @@ namespace BasicSharp.Compiler.Analyzer
 
             return result;
         }
+
+        public List<Variable> GetDefinitionFor(Parser.Syntaxes.AccessorExpression accessor)
+        {
+            return (from item in knowVariables
+                    where item.Name == accessor.Identifier.StringValue
+                    select item).ToList();
+        }
     }
 }

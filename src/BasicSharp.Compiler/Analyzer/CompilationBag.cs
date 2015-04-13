@@ -18,6 +18,7 @@ namespace BasicSharp.Compiler.Analyzer
                                              };
 
         List<MethodStub> methodStubs = new List<MethodStub>();
+        List<Type> allowedTypes = new List<Type>();
         List<Variable> fields = new List<Variable>();
         List<Assembly> assemblies = new List<Assembly>();
 
@@ -48,7 +49,6 @@ namespace BasicSharp.Compiler.Analyzer
 
             loadField();
         }
-
 
         //1. Verifica se a classe existe
         public bool ContainsClass(string fullClassName)
@@ -84,6 +84,8 @@ namespace BasicSharp.Compiler.Analyzer
                                                    c.IsAbstract
                              select c;
 
+            allowedTypes.AddRange(_class);
+
             //Só poderá existir um tipo com estes atributos
             return _class.Any();
         }
@@ -108,7 +110,11 @@ namespace BasicSharp.Compiler.Analyzer
                                                            Name = p.Identifier.StringValue,
                                                            Type = p.Type.GetCLRType()
                                                        }
-                                      select new MethodStub(name, parameters);
+                                      select new MethodStub(name, true, parameters)
+                                      {
+                                          InternalDefinition = item,
+                                          ReturnType = item.ReturnType.GetCLRType()
+                                      };
 
             this.methodStubs.AddRange(internalMethodStubs);
         }
@@ -116,7 +122,7 @@ namespace BasicSharp.Compiler.Analyzer
         {
             foreach (var ass in assemblies)
             {
-                var staticClasses = from c in ass.GetTypes()
+                var staticClasses = from c in allowedTypes //ass.GetTypes()
                                     where c.IsSealed && c.IsAbstract
                                     select c;
 
@@ -153,15 +159,19 @@ namespace BasicSharp.Compiler.Analyzer
                               let decl = (item as FieldDeclaration).Declaration
                               select new {
                                   type = decl.Type.GetCLRType(),
-                                  vars = from declarator in decl.Declarators
-                                         select declarator.Identifier.StringValue
+                                  vars = decl.Declarators
                               };
 
             var result = new List<Variable>();
             foreach (var item in declarators) {
                 var type = item.type;
                 foreach (var name in item.vars)
-                    result.Add(new Variable { Name = name, ClrType = type });
+                    result.Add(new Variable
+                    {
+                        Name = name.Identifier.StringValue,
+                        ClrType = type,
+                        Definition = name
+                    });
             }
 
             this.fields.AddRange(result);

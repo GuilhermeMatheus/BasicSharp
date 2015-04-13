@@ -25,5 +25,44 @@ namespace BasicSharp.Compiler.Lexer.Extensions
                 IsMalformedToken = lessSignificantPart.IsMalformedToken || moreSignificantPart.IsMalformedToken
             };
         }
+
+        public static Type GetLiteralCLRType(this SyntaxKind type)
+        {
+            switch (type)
+            {
+                case SyntaxKind.TrueKeyword:
+                case SyntaxKind.FalseKeyword:
+                    return typeof(bool);
+                case SyntaxKind.StringLiteral:
+                    return typeof(string);
+                case SyntaxKind.CharLiteral:
+                    return typeof(char);
+                case SyntaxKind.IntegerLiteral:
+                    return typeof(int);
+                case SyntaxKind.DoubleLiteral:
+                    return typeof(double);
+                case SyntaxKind.ByteLiteral:
+                    return typeof(byte);
+                default:
+                    return null;
+            }
+        }
+
+        public static bool IsLogicalOperator(this SyntaxKind kind)
+        {
+            switch (kind)
+            {
+                case SyntaxKind.AndOperator:
+                case SyntaxKind.OrOperator:
+                case SyntaxKind.EqualsEqualsOperator:
+                case SyntaxKind.MinorOperator:
+                case SyntaxKind.MinorEqualsOperator:
+                case SyntaxKind.MajorOperator:
+                case SyntaxKind.MajorEqualsOperator:
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 }

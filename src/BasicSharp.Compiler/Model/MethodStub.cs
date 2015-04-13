@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BasicSharp.Compiler.Parser.Syntaxes;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -13,18 +14,28 @@ namespace BasicSharp.Compiler
         List<MethodStubParameter> parameters;
 
         public string Name { get; internal set; }
-        public int Arity { get; internal set; }
+        public int Arity
+        {
+            get { return parameters.Count; }
+        }
         public ReadOnlyCollection<MethodStubParameter> Parameters
         {
             get { return parameters.AsReadOnly(); }
         }
 
-        public MethodStub(string name, IEnumerable<MethodStubParameter> parameters)
+        public Assembly ExternalAssembly { get; private set; }
+
+        public bool IsInternal { get; internal set; }
+        public MethodDeclaration InternalDefinition { get; set; }
+
+        public Type ReturnType { get; internal set; }
+
+        public MethodStub(string name, bool isInternal, IEnumerable<MethodStubParameter> parameters)
         {
             this.Name = name;
+            this.IsInternal = IsInternal;
             this.parameters = parameters == null ? new List<MethodStubParameter>() : parameters.ToList();
         }
-        
         public static MethodStub FromMethodInfo(MethodInfo method)
         {
             var name = method.Name;
@@ -35,8 +46,11 @@ namespace BasicSharp.Compiler
                                  Type = item.ParameterType
                              };
 
-            return new MethodStub(name, parameters);
+            return new MethodStub(name, false, parameters)
+            {
+                ReturnType = method.ReturnType,
+                ExternalAssembly = method.DeclaringType.Assembly
+            };
         }
-
     }
 }

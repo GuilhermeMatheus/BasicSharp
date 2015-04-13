@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BasicSharp.Compiler.Parser.Syntaxes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,5 +11,6 @@ namespace BasicSharp.Compiler
     {
         public Type ClrType { get; set; }
         public string Name { get; set; }
+        public SyntaxNode Definition { get; set; }
     }
 }

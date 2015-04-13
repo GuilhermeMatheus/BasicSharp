@@ -43,7 +43,6 @@
 
     <!-- Types -->
     <Keywords fontWeight="bold" foreground="Red">
-      <Word>null</Word>
       <Word>void</Word>
       <Word>int</Word>
       <Word>bool</Word>
@@ -55,6 +54,7 @@
 
     <!-- Constants -->
     <Keywords fontWeight="bold" foreground="DarkRed">
+      <Word>null</Word>
       <Word>true</Word>
       <Word>false</Word>
     </Keywords>

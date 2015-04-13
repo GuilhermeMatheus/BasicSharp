@@ -42,6 +42,7 @@
     <Compile Include="Analyzer\AnalysisResult.cs" />
     <Compile Include="Analyzer\CodeInfo.cs" />
     <Compile Include="Analyzer\CodeLens.cs" />
+    <Compile Include="Analyzer\Extensions\TypeExtensions.cs" />
     <Compile Include="Analyzer\Specialized\AnalysisResults.cs" />
     <Compile Include="Analyzer\Specialized\CompilationUnitAnalyzer.cs" />
     <Compile Include="Analyzer\Specialized\ExpressionAnalyzer.cs" />
@@ -63,6 +64,7 @@
     <Compile Include="Lexer\LexicalException.cs" />
     <Compile Include="Lexer\Token\SyntaxKind.cs" />
     <Compile Include="Lexer\Token\TokenInfo.cs" />
+    <Compile Include="Model\MemoryProject.cs" />
     <Compile Include="Model\Variable.cs" />
     <Compile Include="Model\MethodStub.cs" />
     <Compile Include="Model\MethodStubParameter.cs" />
@@ -121,7 +123,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Analyzer\Extensions\" />
     <Folder Include="ILEmitter\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

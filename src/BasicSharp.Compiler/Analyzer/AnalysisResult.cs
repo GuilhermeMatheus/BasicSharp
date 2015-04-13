@@ -1,11 +1,13 @@
 ﻿using BasicSharp.Compiler.Parser.Syntaxes;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
 namespace BasicSharp.Compiler.Analyzer
 {
+    [DebuggerDisplay("{MessageResult}")]
     public class AnalysisResult
     {
         public SyntaxNode Node { get; internal set; }

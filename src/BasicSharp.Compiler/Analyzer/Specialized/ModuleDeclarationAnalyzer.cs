@@ -59,7 +59,7 @@ namespace BasicSharp.Compiler.Analyzer
             foreach (var item in AnalysisFor(auxListForFields))
                 yield return item;
 
-            foreach (var item in AnalysisFor(auxListForFields))
+            foreach (var item in AnalysisFor(auxListMethods))
                 yield return item;
         }
     }

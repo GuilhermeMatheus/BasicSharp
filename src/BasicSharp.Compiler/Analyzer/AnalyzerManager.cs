@@ -15,23 +15,18 @@ namespace BasicSharp.Compiler.Analyzer
         public CompilationBag CompilationBag { get; private set; }
 
         readonly Dictionary<SyntaxNode, VariableBag> bagFromNode = new Dictionary<SyntaxNode, VariableBag>();
-        readonly List<AnalysisResult> analysisResults = new List<AnalysisResult>();
         
-        public ReadOnlyCollection<AnalysisResult> AnalysisResults
-        {
-            get { return analysisResults.AsReadOnly(); }
-        }
-
         public AnalyzerManager(Project project, CompilationUnit compilationUnit)
         {
             this.CompilationBag = new CompilationBag(project, compilationUnit);
-            analyzeCompilationUnit();
         }
 
-        void analyzeCompilationUnit()
+        public List<AnalysisResult> GetAnalysisForCompilationUnit()
         {
-            var analysis = AnalyzerFactory.GetAnalyzerFor<CompilationUnit>(this).GetAnalysis(CompilationBag.CompilationUnit);
-            addAnalysis(analysis);
+            return AnalyzerFactory.GetAnalyzerFor<CompilationUnit>(this)
+                                  .GetAnalysis(CompilationBag.CompilationUnit)
+                                  .Where(a => a != AnalysisResult.Empty)
+                                  .ToList();
         }
 
         public VariableBag AskForBag(SyntaxNode child)
@@ -47,7 +42,7 @@ namespace BasicSharp.Compiler.Analyzer
         }
 
         VariableBag createBagFor(SyntaxNode node)
-        {
+        {//Apenas casos especiais, então expressões possuem o mesmo do pai
             var result = new VariableBag();
 
             IEnumerable<Statement> statements = null;
@@ -63,7 +58,8 @@ namespace BasicSharp.Compiler.Analyzer
                     result.AddKnowVariable(new Variable
                     {
                         ClrType = type,
-                        Name = name
+                        Name = name,
+                        Definition = item
                     });
                 }
                 statements = method.Block.Statements;
@@ -76,6 +72,12 @@ namespace BasicSharp.Compiler.Analyzer
                 statements = (node as WhileStatement).Block.Statements;
             else if (node is BlockStatement)
                 statements = (node as BlockStatement).Statements;
+            else
+            {
+                var notSpecialCaseBag = AskForBag(node);
+                bagFromNode.Add(node, notSpecialCaseBag);
+                return notSpecialCaseBag;
+            }
 
             var varDecls = from item in statements
                            where item.GetType() == typeof(LocalVariableDeclarationStatement)
@@ -97,19 +99,9 @@ namespace BasicSharp.Compiler.Analyzer
                 yield return new Variable
                 {
                     ClrType = type,
-                    Name = item.Identifier.StringValue
+                    Name = item.Identifier.StringValue,
+                    Definition = item
                 };
-        }
-
-        bool addAnalysis(IEnumerable<AnalysisResult> analysis)
-        {
-            var src = analysis.Where(a => a != AnalysisResult.Empty);
-
-            if (!src.Any())
-                return false;
-
-            analysisResults.AddRange(src);
-            return true;
         }
     }
 }
