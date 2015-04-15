@@ -23,7 +23,7 @@ namespace BasicSharp.Compiler.Parser
             get { return _syntacticErrors.AsReadOnly(); }
         }
 
-        public Parser(lxr.Lexer lexer) 
+        public Parser(lxr.Lexer lexer)
             : this(lexer.GetTokens().GetEnumerator())
         {
             this.lexer = lexer;
@@ -39,18 +39,24 @@ namespace BasicSharp.Compiler.Parser
         public SyntaxNode GetSyntax()
         {
             enumerator.MoveNext();
-            SyntaxNode root;
 
-            if ((root = getCompilationUnit()) != null)
-                return root;
+            var result = getCompilationUnit();
 
-            if ((root = getFieldOrMethodDeclaration()) != null)
-                return root;
+            if (currentToken().Kind != SyntaxKind.None)
+                handleError(SyntacticExceptions.NotExpectedToken(currentToken(), result));
 
-            if ((root = getExpression()) != null)
-                return root;
+            return result;
+            
+            //For DEBUG only:
 
-            return null;
+            //SyntaxNode root;
+            //if ((root = getCompilationUnit()) != null)
+            //    return root;
+            //if ((root = getFieldOrMethodDeclaration()) != null)
+            //    return root;
+            //if ((root = getExpression()) != null)
+            //    return root;
+            //return null;
         }
 
         #region CompilerUnit
@@ -90,11 +96,12 @@ namespace BasicSharp.Compiler.Parser
 
             var result = new ImplementsDirective { ImplementsToken = implements };
 
-            while (moveNextToken().Kind.IsIn(SyntaxKind.Identifier, SyntaxKind.DotToken))
+            var expectingDot = true;
+            while (moveNextToken().Kind == ((expectingDot = !expectingDot) ? SyntaxKind.DotToken : SyntaxKind.Identifier))
                 result.AddFullClassNamePart(currentToken());
 
             if (currentToken().Kind != SyntaxKind.SemicolonToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.SemicolonToken));
 
             result.SemicolonToken = currentToken();
             moveNextToken();
@@ -112,7 +119,7 @@ namespace BasicSharp.Compiler.Parser
 
             var name = moveNextToken();
             if (name.Kind != SyntaxKind.Identifier)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.Identifier));
 
             dumpTrivia(result);
             result.Name = name;
@@ -121,7 +128,7 @@ namespace BasicSharp.Compiler.Parser
 
             var openBrace = moveNextToken();
             if (openBrace.Kind != SyntaxKind.OpenBraceToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.OpenBraceToken));
 
             result.OpenBraceToken = openBrace;
             moveNextToken();
@@ -137,7 +144,7 @@ namespace BasicSharp.Compiler.Parser
 
             var closeBrace = currentToken();
             if (closeBrace.Kind != SyntaxKind.CloseBraceToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.CloseBraceToken));
 
             result.CloseBraceToken = closeBrace;
             moveNextToken();
@@ -156,7 +163,7 @@ namespace BasicSharp.Compiler.Parser
             moveNextToken();
             var type = getPredefinedType();
             if (type == null)
-                handleError(SyntacticExceptions.ExpectedTokenNotFound(currentToken().Line, currentToken().EndColumn, "predefined type"));
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(currentToken().Line, currentToken().EndColumn, "predefinedType")); //Type esperado, etc etc
 
             var identifier = currentToken();
             if (identifier.Kind != SyntaxKind.Identifier)
@@ -165,15 +172,20 @@ namespace BasicSharp.Compiler.Parser
             moveNextToken();
             var parameterList = getParameterList();
             if (parameterList != null)
+            {
+                var block = getBlock();
+                if (block == null)
+                    handleError(SyntacticExceptions.ExpectedTokenNotFound(currentToken().Line, currentToken().EndColumn, SyntaxKind.OpenBraceToken));
+
                 return new MethodDeclaration
                 {
                     Modifier = modifier,
                     ReturnType = type,
                     Identifier = identifier,
                     ParameterList = parameterList,
-                    Block = getBlock()
+                    Block = block
                 };
-
+            }
             return getFieldDeclaration(modifier, type, identifier);
         }
         PredefinedType getPredefinedType()
@@ -193,7 +205,7 @@ namespace BasicSharp.Compiler.Parser
                 var expression = getExpression();
                 var closeBracket = currentToken();
                 if (closeBracket.Kind != SyntaxKind.CloseBracketToken)
-                    handleError();
+                    handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.CloseBraceToken));
 
                 result.ArraySpecifier = new ArrayRankSpecifier
                 {
@@ -227,7 +239,7 @@ namespace BasicSharp.Compiler.Parser
 
             dumpTrivia(variableDeclaration);
             if (current.Kind != SyntaxKind.CommaToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.CommaToken));
 
             variableDeclaration.AddTrivia(currentToken());
             moveNextToken();
@@ -245,14 +257,14 @@ namespace BasicSharp.Compiler.Parser
             }
 
             if (currentToken().Kind != SyntaxKind.SemicolonToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.SemicolonToken));
 
             result.SemicolonToken = currentToken();
 
             moveNextToken();
             return result;
         }
-        
+
 
         ParameterList getParameterList()
         {
@@ -280,7 +292,7 @@ namespace BasicSharp.Compiler.Parser
 
             var closeParen = currentToken();
             if (closeParen.Kind != SyntaxKind.CloseParenToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.CloseBraceToken));
 
             dumpTrivia(result);
             result.CloseParenToken = closeParen;
@@ -296,7 +308,7 @@ namespace BasicSharp.Compiler.Parser
 
             var identifier = currentToken();
             if (identifier.Kind != SyntaxKind.Identifier)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(currentToken().Line, currentToken().EndColumn, SyntaxKind.Identifier));
 
             moveNextToken();
             var result = new Parameter { Type = type, Identifier = identifier };
@@ -304,7 +316,7 @@ namespace BasicSharp.Compiler.Parser
 
             return result;
         }
-        
+
         MethodDeclaration getMethod()
         {
             throw new NotImplementedException();
@@ -332,7 +344,7 @@ namespace BasicSharp.Compiler.Parser
             moveNextToken();
 
             if (closeBrace.Kind != SyntaxKind.CloseBraceToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.CloseBraceToken));
 
             result.CloseBraceToken = closeBrace;
 
@@ -353,7 +365,7 @@ namespace BasicSharp.Compiler.Parser
         Statement getMethodInvocationOrLocalVariableAssignmentStatement()
         {
             var identifier = currentToken();
-            
+
             if (identifier.Kind != SyntaxKind.Identifier)
                 return null;
 
@@ -365,7 +377,7 @@ namespace BasicSharp.Compiler.Parser
 
                 var semicolon = currentToken();
                 if (semicolon.Kind != SyntaxKind.SemicolonToken)
-                    handleError();
+                    handleError(SyntacticExceptions.ExpectedTokenNotFound(currentToken().Line, currentToken().EndColumn, SyntaxKind.SemicolonToken));
 
                 var methodResult = new MethodInvocationStatement
                 {
@@ -394,7 +406,7 @@ namespace BasicSharp.Compiler.Parser
             var result = new LocalVariableAssignmentStatement { Declarator = declarator };
 
             if (currentToken().Kind != SyntaxKind.SemicolonToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.SemicolonToken));
 
             result.SemicolonToken = currentToken();
             dumpTrivia(result);
@@ -409,7 +421,7 @@ namespace BasicSharp.Compiler.Parser
                 return null;
 
             var result = new ReturnStatement { ReturnToken = returnToken };
-            
+
             moveNextToken();
             dumpTrivia(result);
 
@@ -417,7 +429,7 @@ namespace BasicSharp.Compiler.Parser
 
             var semicolon = currentToken();
             if (semicolon.Kind != SyntaxKind.SemicolonToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.SemicolonToken));
 
             moveNextToken();
             result.SemicolonToken = semicolon;
@@ -431,12 +443,12 @@ namespace BasicSharp.Compiler.Parser
                 return null;
 
             var result = new BreakStatement { BreakToken = breakToken };
-            
+
             dumpTrivia(result);
 
             var semicolon = moveNextToken();
             if (semicolon.Kind != SyntaxKind.SemicolonToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.SemicolonToken));
 
             moveNextToken();
             dumpTrivia(result);
@@ -456,8 +468,8 @@ namespace BasicSharp.Compiler.Parser
 
             var openParen = moveNextToken();
             if (openParen.Kind != SyntaxKind.OpenParenToken)
-                handleError();
-            
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.OpenBraceToken));
+
             result.OpenParenToken = openParen;
 
             dumpTrivia(result);
@@ -466,7 +478,7 @@ namespace BasicSharp.Compiler.Parser
 
             var closeParen = currentToken();
             if (closeParen.Kind != SyntaxKind.CloseParenToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.CloseBraceToken));
 
             result.CloseParenToken = closeParen;
 
@@ -480,7 +492,7 @@ namespace BasicSharp.Compiler.Parser
                 result.ElseToken = elseToken;
 
                 dumpTrivia(result);
-                
+
                 moveNextToken();
 
                 result.Else = getBlock();
@@ -499,7 +511,7 @@ namespace BasicSharp.Compiler.Parser
 
             var openParen = moveNextToken();
             if (openParen.Kind != SyntaxKind.OpenParenToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.OpenBraceToken));
 
             moveNextToken();
 
@@ -509,7 +521,7 @@ namespace BasicSharp.Compiler.Parser
             result.Initializer = getExpression();
             var firstSemicolon = currentToken();
             if (firstSemicolon.Kind != SyntaxKind.SemicolonToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.SemicolonToken));
 
             result.FirstSemicolonToken = firstSemicolon;
             dumpTrivia(result);
@@ -518,7 +530,7 @@ namespace BasicSharp.Compiler.Parser
             result.Condition = getExpression();
             var secondSemicolon = currentToken();
             if (secondSemicolon.Kind != SyntaxKind.SemicolonToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.SemicolonToken));
 
             moveNextToken();
             result.SecondSemicolonToken = secondSemicolon;
@@ -528,7 +540,7 @@ namespace BasicSharp.Compiler.Parser
 
             var closeParen = currentToken();
             if (closeParen.Kind != SyntaxKind.CloseParenToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.CloseBraceToken));
 
             moveNextToken();
             result.CloseParenToken = closeParen;
@@ -548,7 +560,7 @@ namespace BasicSharp.Compiler.Parser
 
             var openParen = moveNextToken();
             if (openParen.Kind != SyntaxKind.OpenParenToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.OpenParenToken));
 
             result.OpenParenToken = openParen;
 
@@ -558,7 +570,7 @@ namespace BasicSharp.Compiler.Parser
 
             var closeParen = currentToken();
             if (closeParen.Kind != SyntaxKind.CloseParenToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.CloseBraceToken));
 
             result.CloseParenToken = closeParen;
 
@@ -577,8 +589,8 @@ namespace BasicSharp.Compiler.Parser
             var result = new LocalVariableDeclarationStatement();
             var identifier = currentToken();
             if (identifier.Kind != SyntaxKind.Identifier)
-                handleError();
-            
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.Identifier));
+
             moveNextToken();
             var variableDeclaration = VariableDeclaration.WithDeclarator(getVariableDeclarator(identifier));
             variableDeclaration.Type = type;
@@ -595,7 +607,7 @@ namespace BasicSharp.Compiler.Parser
 
             dumpTrivia(variableDeclaration);
             if (current.Kind != SyntaxKind.CommaToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.CommaToken));
 
             variableDeclaration.AddTrivia(currentToken());
             moveNextToken();
@@ -613,7 +625,7 @@ namespace BasicSharp.Compiler.Parser
             }
 
             if (currentToken().Kind != SyntaxKind.SemicolonToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.SemicolonToken));
 
             result.SemicolonToken = currentToken();
 
@@ -684,6 +696,9 @@ namespace BasicSharp.Compiler.Parser
 
             switch (op.Kind)
             {
+                case SyntaxKind.ExclamationEqualsToken:
+                    result = new ExclamationEqualsExpression();
+                    break;
                 case SyntaxKind.EqualsEqualsOperator:
                     result = new EqualsEqualsExpression();
                     break;
@@ -720,9 +735,10 @@ namespace BasicSharp.Compiler.Parser
             if (root == null)
                 return null;
 
-            while(true)
+            while (true)
             {
-                if ((aux = getAdditiveExpression(root)) != root) {
+                if ((aux = getAdditiveExpression(root)) != root)
+                {
                     root = aux;
                     continue;
                 }
@@ -748,11 +764,11 @@ namespace BasicSharp.Compiler.Parser
             var innerExpression = getExpression();
 
             if (innerExpression == null)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(currentToken().Line, currentToken().EndColumn, "innerExpression"));
 
             var closeParen = currentToken();
             if (closeParen.Kind != SyntaxKind.CloseParenToken)
-                handleError();
+                handleError(SyntacticExceptions.ExpectedTokenNotFound(currentToken().Line, currentToken().EndColumn, "closeParen"));
 
             moveNextToken();
             return new ParenthesedExpression
@@ -785,7 +801,7 @@ namespace BasicSharp.Compiler.Parser
                 bracketed.ArgumentExpression = getExpression();
 
                 if (currentToken().Kind != SyntaxKind.CloseBracketToken)
-                    handleError();
+                    handleError(SyntacticExceptions.ExpectedTokenNotFound(result, SyntaxKind.CloseBracketToken));
 
                 bracketed.CloseBracketToken = currentToken();
                 moveNextToken();
@@ -798,7 +814,7 @@ namespace BasicSharp.Compiler.Parser
                 moveNextToken();
                 return new VariableAssignmentExpression { Identifier = identifier, Assignment = getAssignmentExpression(curr) };
             }
-            
+
             return result;
         }
         VariableAssignmentExpression getVariableDeclarator()
@@ -823,7 +839,7 @@ namespace BasicSharp.Compiler.Parser
                 moveNextToken();
                 return new VariableAssignmentExpression { Identifier = identifier, Assignment = getAssignmentExpression(current) };
             }
-            handleError();
+            handleError(SyntacticExceptions.ExpectedTokenNotFound(currentToken().Line, currentToken().EndColumn, SyntaxKind.SemicolonToken));
             return null;
         }
         AssignmentExpression getAssignmentExpression(TokenInfo assignmentOperatorInfo)
@@ -844,7 +860,7 @@ namespace BasicSharp.Compiler.Parser
 
                 openParen = moveNextToken();
                 if (openParen.Kind != SyntaxKind.OpenParenToken)
-                    handleError();
+                    handleError(SyntacticExceptions.ExpectedTokenNotFound(currentToken().Line, currentToken().EndColumn, SyntaxKind.OpenParenToken));
 
                 moveNextToken();
             }
@@ -897,13 +913,15 @@ namespace BasicSharp.Compiler.Parser
             var rightSide = getMultiplicativeExpression(null);
 
             if (op.Kind == SyntaxKind.PlusToken)
-                return new AddExpression {
+                return new AddExpression
+                {
                     LeftSide = leftSide,
                     OperatorToken = op,
                     RightSide = rightSide
                 };
             else
-                return new SubtractExpression {
+                return new SubtractExpression
+                {
                     LeftSide = leftSide,
                     OperatorToken = op,
                     RightSide = rightSide
@@ -945,10 +963,10 @@ namespace BasicSharp.Compiler.Parser
         Expression getModExpression(Expression leftSide)
         {
             leftSide = leftSide ?? getUnaryExpression();
-            
+
             if (leftSide == null)
                 return null;
-            
+
             dumpTrivia(leftSide);
 
             var op = currentToken();
@@ -970,7 +988,7 @@ namespace BasicSharp.Compiler.Parser
         Expression getSignedUnaryExpression()
         {
             var signal = currentToken();
-            
+
             if (signal.Kind.IsIn(SyntaxKind.MinusToken, SyntaxKind.PlusToken))
             {
                 moveNextToken();
@@ -990,7 +1008,7 @@ namespace BasicSharp.Compiler.Parser
 
             var result = new LiteralExpression { Value = value };
             dumpTrivia(result);
-            
+
             return result;
         }
         #endregion
@@ -1030,9 +1048,6 @@ namespace BasicSharp.Compiler.Parser
         //TODO: Implements Error Handler
         void handleError(SyntacticException error = null)
         {
-            if (error != null)
-                Console.WriteLine(error.Message);
-
             _syntacticErrors.Add(error);
         }
     }
