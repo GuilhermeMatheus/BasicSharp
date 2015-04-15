@@ -60,6 +60,7 @@
     </ApplicationDefinition>
     <Compile Include="Helpers\BindableSelectedItemBehavior.cs" />
     <Compile Include="Helpers\Command.cs" />
+    <Compile Include="Helpers\ComparerConverter.cs" />
     <Compile Include="Helpers\NullSafeCollectionConverter.cs" />
     <Compile Include="Helpers\TextEditorBindingHelper.cs" />
     <Compile Include="ViewModel\IdeViewModel.cs" />
