@@ -13,5 +13,10 @@ namespace BasicSharp.Compiler
         public List<string> AssembliesAddress { get; set; }
         
         public abstract Stream GetSourceStream();
+
+        public Project()
+        {
+            this.AssembliesAddress = new List<string>();
+        }
     }
 }

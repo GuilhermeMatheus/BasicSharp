@@ -55,6 +55,7 @@ namespace BasicSharp.Compiler.Lexer.Extensions
                 case SyntaxKind.AndOperator:
                 case SyntaxKind.OrOperator:
                 case SyntaxKind.EqualsEqualsOperator:
+                case SyntaxKind.ExclamationEqualsToken:
                 case SyntaxKind.MinorOperator:
                 case SyntaxKind.MinorEqualsOperator:
                 case SyntaxKind.MajorOperator:

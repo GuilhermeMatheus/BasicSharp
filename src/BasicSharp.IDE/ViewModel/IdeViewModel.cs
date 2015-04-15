@@ -1,8 +1,10 @@
-﻿using BasicSharp.Compiler.Lexer;
+﻿using BasicSharp.Compiler;
+using BasicSharp.Compiler.Lexer;
 using BasicSharp.Compiler.Parser.Syntaxes;
 using BasicSharp.IDE.Helpers;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +19,24 @@ namespace BasicSharp.IDE.ViewModel
     public class IdeViewModel : ViewModelBase
     {
         public event EventHandler<SelectedItemChanged> SelectedItemChanged = (s, e) => { };
-        
+
+        FileProject project;
+        public FileProject Project
+        {
+            get
+            {
+                return project;
+            }
+            set
+            {
+                if (project != value)
+                {
+                    project = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private SourceViewModel currentSource;
         public SourceViewModel CurrentSource
         {
@@ -25,7 +44,9 @@ namespace BasicSharp.IDE.ViewModel
             set
             {
                 if (currentSource == value)
-                    return; currentSource = value;
+                    return; 
+                
+                currentSource = value;
                 OnPropertyChanged();
             }
         }
@@ -47,7 +68,7 @@ namespace BasicSharp.IDE.ViewModel
 
         public IdeViewModel()
         {
-            this.CurrentSource = new SourceViewModel { FileName = "Module1.bs" };
+            //this.CurrentSource = new SourceViewModel { FileName = "Module1.bs" };
         }
 
 

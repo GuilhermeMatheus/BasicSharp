@@ -9,14 +9,15 @@ namespace BasicSharp.Compiler
 {
     public class FileProject : Project
     {
-        public string SourceFileAddress { get; set; }
+        public string ProjectFileAddress { get; set; }
 
         public override Stream GetSourceStream()
         {
-            if (SourceFileAddress == null)
+            if (ProjectFileAddress == null)
                 return null;
-
-            return new FileStream(SourceFileAddress, FileMode.Open);
+            
+            var sourcePath = System.IO.Path.GetDirectoryName(ProjectFileAddress) + "\\Source.bs";
+            return new FileStream(sourcePath , FileMode.Open);
         }
     }
 }

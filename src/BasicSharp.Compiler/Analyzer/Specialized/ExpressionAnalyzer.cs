@@ -137,7 +137,7 @@ namespace BasicSharp.Compiler.Analyzer
                 analysisSession.Add(AnalysisResults.InvalidOperator(b, lType, rType));
             else if (result == typeof(string) || result == typeof(char))
             {
-                if (kind != SyntaxKind.EqualsEqualsOperator)
+                if (!kind.IsIn(SyntaxKind.EqualsEqualsOperator, SyntaxKind.ExclamationEqualsToken))
                     analysisSession.Add(AnalysisResults.InvalidOperator(b, lType, rType));
             }
 

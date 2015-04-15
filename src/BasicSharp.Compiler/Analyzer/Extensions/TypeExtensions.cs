@@ -8,17 +8,13 @@ namespace BasicSharp.Compiler.Analyzer.Extensions
 {
     public static class TypeExtensions
     {
+        static readonly Type[] NoHierarchyTypes = { typeof(string), typeof(char), typeof(bool) };
+
         public static Type GetSuitableType(Type l, Type r)
         {
-            if (l == typeof(string))
-                return r == typeof(string) ? l : null;
-
-            if (l == typeof(char))
-                return r == typeof(char) ? l : null;
-
-            if (l == typeof(bool))
-                return r == typeof(bool) ? l : null;
-
+            if (NoHierarchyTypes.Contains(l) || NoHierarchyTypes.Contains(r))
+                return (l == r) ? l : null;
+            
             return GetMaxNumericAncestor(l, r);
         }
 

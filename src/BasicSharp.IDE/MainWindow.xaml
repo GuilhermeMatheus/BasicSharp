@@ -15,8 +15,21 @@
     </Window.DataContext>
 
     <Window.Resources>
+        <!--null2Col-->
+        <helpers:ComparerConverter x:Key="null2Vis"
+                                   TargetValue="{x:Null}"
+                                   CommomValues="Visibility"/>
+
+        <!--null2False-->
+        <helpers:ComparerConverter x:Key="null2False"
+                                   TargetValue="{x:Null}"
+                                   Operator="NotEquals"
+                                   CommomValues="Bool"/>
+
+        <!--nullSafeColConv-->
         <helpers:NullSafeCollectionConverter x:Key="nullSafeColConv"/>
-        
+
+        <!--statusRectStyle-->
         <Style x:Key="statusRectStyle"
                TargetType="{x:Type Rectangle}">
             <Setter Property="Width" Value="16"/>
@@ -33,7 +46,6 @@
             </Style.Triggers>
         </Style>
                
-        
     </Window.Resources>
     
     <!--Root-->
@@ -47,65 +59,112 @@
         <!--Menu-->
         <Menu VerticalAlignment="Top">
             <MenuItem Header="Arquivo">
-                <MenuItem Header="Novo projeto" />
-                <MenuItem Header="Abrir projeto" />
+                <MenuItem Header="Novo projeto"
+                          Click="BtnCriarProjeto"/>
+                <MenuItem Header="Abrir projeto"
+                          Click="BtnAbrirProjeto"/>
+                <Separator/>
+                <MenuItem Header="Salvar"
+                          Click="BtnSalvarProjeto"/>
+                <MenuItem Header="Propriedades"
+                          Click="BtnPropriedadesProjeto"/>
                 <Separator/>
                 <MenuItem Header="Sair" />
             </MenuItem>
         </Menu>
         
         <!--Workspace-->
-        <Grid  Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <!--Editors-->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
 
-            <!--Visualizers-->
-            <TabControl Margin="5">
-                <!--Tokens-->
-                <TabItem Header="Tokens">
-                    <ListView ItemsSource="{Binding CurrentSource.Tokens}"
-                              SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}">
+                <!--Visualizers-->
+                <TabControl Margin="5">
+                    <!--Tokens-->
+                    <TabItem Header="Tokens">
+                        <ListView ItemsSource="{Binding CurrentSource.Tokens}"
+                                  SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}">
                         
-                    </ListView>
-                </TabItem>
-                <!--SyntaxTree-->
-                <TabItem Header="SyntaxTree">
-                    <TreeView ItemsSource="{Binding CurrentSource.Syntax}">
-                        <TreeView.Resources>
-                            <HierarchicalDataTemplate DataType="{x:Type syntax:SyntaxNode}"
-                                                      ItemsSource="{Binding Childs, Converter={StaticResource nullSafeColConv}}">
-                                <TextBlock Foreground="Blue" Text="{Binding DisplayMember}" />
-                            </HierarchicalDataTemplate>
-                            <HierarchicalDataTemplate DataType="{x:Type lexer:TokenInfo}">
-                                <TextBlock Foreground="Green" Text="{Binding }" />
-                            </HierarchicalDataTemplate>
-                        </TreeView.Resources>
-                        <i:Interaction.Behaviors>
-                            <helpers:BindableSelectedItemBehavior SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}" />
-                        </i:Interaction.Behaviors>
-                    </TreeView>
-                </TabItem>
-            </TabControl>
+                        </ListView>
+                    </TabItem>
+                    <!--SyntaxTree-->
+                    <TabItem Header="SyntaxTree">
+                        <TreeView Focusable="False" x:Name="treeView"
+                                  ItemsSource="{Binding CurrentSource.Syntax}">
+                            <TreeView.Resources>
+                                <HierarchicalDataTemplate DataType="{x:Type syntax:SyntaxNode}"
+                                                          ItemsSource="{Binding Childs, Converter={StaticResource nullSafeColConv}}">
+                                    <TextBlock Foreground="Blue" Text="{Binding DisplayMember}" />
+                                </HierarchicalDataTemplate>
+                                <HierarchicalDataTemplate DataType="{x:Type lexer:TokenInfo}">
+                                    <TextBlock Foreground="Green" Text="{Binding }" />
+                                </HierarchicalDataTemplate>
+                            </TreeView.Resources>
+                            <i:Interaction.Behaviors>
+                                <helpers:BindableSelectedItemBehavior SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}" />
+                            </i:Interaction.Behaviors>
+                        </TreeView>
+                    </TabItem>
+                </TabControl>
             
-            <!--Separator-->
-            <GridSplitter Width="2"
-                          VerticalAlignment="Stretch"
-                          HorizontalAlignment="Right"/>
+                <!--Separator-->
+                <GridSplitter Width="2"
+                              VerticalAlignment="Stretch"
+                              HorizontalAlignment="Right"/>
             
-            <!--Tabs-->
-            <TabControl Grid.Column="1"
-                        Margin="4,5,5,5">
-                <TabItem Header="Source" Background="Yellow">
-                    <avalon:TextEditor x:Name="textEditor"
-                                       helpers:TextEditorBindingHelper.Attach="true"
-                                       helpers:TextEditorBindingHelper.Text="{Binding CurrentSource.Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=1000}"
-                                       ShowLineNumbers="True"/>
-                </TabItem>
-            </TabControl>
+                <!--Tabs-->
+                <TabControl Grid.Column="1"
+                            Margin="4,5,5,5">
+                    <TabItem Header="Source" Background="Yellow">
+                        <avalon:TextEditor x:Name="textEditor"
+                                           helpers:TextEditorBindingHelper.Attach="true"
+                                           helpers:TextEditorBindingHelper.Text="{Binding CurrentSource.Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=1000}"
+                                           ShowLineNumbers="True"/>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+            
+            <!--Errors-->
+            <Expander Grid.Row="1"
+                      Header="Erros"
+                      Margin="5,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!--Errors-->
+                    <ListBox Grid.Row="1"
+                             ItemsSource="{Binding CurrentSource.Errors}"
+                             Height="150"/>
+                </Grid>
+            </Expander>
         </Grid>
-       
+        
+        <!--Null Project message-->
+        <Grid Grid.Row="1"
+              Visibility="{Binding CurrentSource, Converter={StaticResource null2Vis}}">
+            <Rectangle Fill="AliceBlue"
+                       VerticalAlignment="Stretch"
+                       HorizontalAlignment="Stretch"
+                       Opacity=".7"/>
+
+            <Image Source="Resources\Images\NullProjectBalloon.png"
+                   VerticalAlignment="Top" Width="240" Margin="5,0,0,0"
+                   HorizontalAlignment="Left"/>
+            
+        </Grid>
+        
         <!--ToolBar-->
         <StatusBar Grid.Row="2"
                    HorizontalAlignment="Stretch">

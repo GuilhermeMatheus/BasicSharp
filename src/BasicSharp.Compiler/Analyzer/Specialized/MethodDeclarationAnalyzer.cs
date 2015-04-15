@@ -12,9 +12,11 @@ namespace BasicSharp.Compiler.Analyzer
         public MethodDeclarationAnalyzer(AnalyzerManager manager) 
             : base (manager) { }
 
+
+
         public override IEnumerable<AnalysisResult> GetAnalysis(MethodDeclaration node)
         {
-            throw new NotImplementedException();
+            yield break;
         }
     }
 }

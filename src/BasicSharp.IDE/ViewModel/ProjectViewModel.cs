@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BasicSharp.Compiler;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -9,8 +10,49 @@ namespace BasicSharp.IDE.ViewModel
 {
     public class ProjectViewModel : ViewModelBase 
     {
-        public ObservableCollection<string> AssembliesAddress { get; set; }
-        public string SourceAddress { get; set; }
-        public string Name { get; set; }
+        public FileProject Project { get; set; }
+
+        public List<string> AssembliesAddress
+        {
+            get
+            {
+                return Project.AssembliesAddress;
+            }
+            set
+            {
+                if (AssembliesAddress != value)
+                {
+                    Project.AssembliesAddress = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public string SourceAddress
+        {
+            get
+            {
+                return Project.ProjectFileAddress;
+            }
+            set
+            {
+                Project.ProjectFileAddress = value;
+            }
+        }
+        public string Name
+        {
+            get
+            {
+                return Project.Name;
+            }
+            set
+            {
+                Project.Name = value;
+            }
+        }
+
+        public ProjectViewModel(FileProject project)
+        {
+            this.Project = project;
+        }
     }
 }

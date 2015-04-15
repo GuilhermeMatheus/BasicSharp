@@ -196,7 +196,9 @@ namespace BasicSharp.Compiler.Lexer
             var ret = new TokenInfo { Begin = text.Offset, Kind = SyntaxKind.None };
             var stringValue = string.Empty;
 
-            if (text.AdvanceIfMatches(stringValue = "=="))
+            if (text.AdvanceIfMatches(stringValue = "!="))
+                ret.Kind = SyntaxKind.ExclamationEqualsToken;
+            else if (text.AdvanceIfMatches(stringValue = "=="))
                 ret.Kind = SyntaxKind.EqualsEqualsOperator;
             else if (text.AdvanceIfMatches(stringValue = "="))
                 ret.Kind = SyntaxKind.EqualsToken;

@@ -15,5 +15,6 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
     public class LogicalLessThanExpression : BinaryExpression { }
     public class LogicalLessOrEqualThanExpression : BinaryExpression { }
 
+    public class ExclamationEqualsExpression : BinaryExpression { }
     public class EqualsEqualsExpression : BinaryExpression { }
 }

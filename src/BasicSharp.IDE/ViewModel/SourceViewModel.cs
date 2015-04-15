@@ -1,4 +1,6 @@
-﻿using BasicSharp.Compiler.Lexer;
+﻿using BasicSharp.Compiler;
+using BasicSharp.Compiler.Analyzer;
+using BasicSharp.Compiler.Lexer;
 using BasicSharp.Compiler.Parser;
 using BasicSharp.Compiler.Parser.Syntaxes;
 using System;
@@ -17,22 +19,9 @@ namespace BasicSharp.IDE.ViewModel
         CompilationSuccess
     }
 
-
     public class SourceViewModel : ViewModelBase
     {
-        public string FileAddress { get; set; }
-
-        private string fileName;
-        public string FileName
-        {
-            get { return fileName; }
-            set
-            {
-                if (fileName == value)
-                    return; fileName = value;
-                OnPropertyChanged();
-            }
-        }
+        FileProject project = null;
 
         private string source;
         public string Source
@@ -49,6 +38,8 @@ namespace BasicSharp.IDE.ViewModel
                 updateTokenAndSyntax();
             }
         }
+
+        public ObservableCollection<string> Errors { get; set; }
 
         private ObservableCollection<TokenInfo> tokens;
         public ObservableCollection<TokenInfo> Tokens
@@ -86,29 +77,49 @@ namespace BasicSharp.IDE.ViewModel
             }
         }
 
-
         public SourceViewModel()
         {
             this.Tokens = new ObservableCollection<TokenInfo>();
+            this.Errors = new ObservableCollection<string>();
+        }
+
+        public void SetSourceAndProject(string source, FileProject project)
+        {
+            this.Source = source;
+            this.project = project;
         }
 
         void updateTokenAndSyntax()
         {
+            Errors.Clear();
+
             var lexer = LexerFactory.FromString(Source);
             var tokens = lexer.GetTokens().ToList();
             var parser = new Parser(tokens.GetEnumerator());
 
             Tokens = new ObservableCollection<TokenInfo>(tokens);
 
-            //try
+            var parsedSyntax = parser.GetSyntax();
+            Syntax = new List<SyntaxNode> { parsedSyntax };
+
+            foreach (var item in lexer.LexicalErrors)
+                Errors.Add(item.Message);
+            
+            foreach (var item in parser.SyntacticErrors)
+                Errors.Add(item.Message);
+
+            if (parsedSyntax as CompilationUnit == null)
+                return;
+
+            try
             {
-                Syntax = new List<SyntaxNode> { parser.GetSyntax() };
-                this.Status = Status.CompilationSuccess;
+                var analyzer = new AnalyzerManager(project, parsedSyntax as CompilationUnit);
+                foreach (var item in analyzer.GetAnalysisForCompilationUnit())
+                    Errors.Add(item.MessageResult);
             }
-            //catch 
-            {
-                this.Status = Status.CompilationException;
-            }
+            catch { }
+
+            this.Status = Errors.Count == 0 ? Status.CompilationSuccess : Status.CompilationException;
         }
     }
 }

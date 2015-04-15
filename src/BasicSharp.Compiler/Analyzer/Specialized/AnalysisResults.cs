@@ -36,7 +36,7 @@ namespace BasicSharp.Compiler.Analyzer
 
         public static AnalysisResult EntryPointNotFound(ModuleDeclaration node)
         {
-            var msg = string.Format("Module '{0}' does not contain a 'Main' method suitable for an entry point", node.Name);
+            var msg = string.Format("Module '{0}' does not contain a 'Main' method suitable for an entry point", node.Name.StringValue);
             return unrecognizedNode(node, msg);
         }
 

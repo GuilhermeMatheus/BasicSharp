@@ -26,6 +26,9 @@ namespace BasicSharp.Compiler.Analyzer
             if (t == typeof(FieldDeclaration))
                 return new FieldDeclarationAnalyzer(manager) as SpecializedAnalyzer<T>;
 
+            if (t == typeof(MethodDeclaration))
+                return new MethodDeclarationAnalyzer(manager) as SpecializedAnalyzer<T>;
+
             throw new NotImplementedException();
         }
     }

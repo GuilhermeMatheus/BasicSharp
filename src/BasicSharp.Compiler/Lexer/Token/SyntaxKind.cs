@@ -24,6 +24,7 @@ namespace BasicSharp.Compiler.Lexer
 
         OrOperator,
         AndOperator,
+        ExclamationEqualsToken,
         EqualsEqualsOperator,
         MinorOperator,
         MinorEqualsOperator,

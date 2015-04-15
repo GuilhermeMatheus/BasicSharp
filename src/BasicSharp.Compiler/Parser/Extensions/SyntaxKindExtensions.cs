@@ -59,6 +59,7 @@ namespace BasicSharp.Compiler.Parser.Extensions
         {
             switch (syntaxKind)
             {
+                case SyntaxKind.ExclamationEqualsToken:
                 case SyntaxKind.EqualsEqualsOperator:
                 case SyntaxKind.MinorOperator:
                 case SyntaxKind.MinorEqualsOperator:

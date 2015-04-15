@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 namespace BasicSharp.IDE.Helpers
 {
-    public class Command : ICommand 
+    public class Command : ICommand
     {
         public Func<object, bool> CanExecuteFunction { get; set; }
         public Action<object> ExecuteAction { get; set; }
@@ -15,7 +15,10 @@ namespace BasicSharp.IDE.Helpers
 
         public bool CanExecute(object parameter)
         {
-            return CanExecuteFunction != null && CanExecuteFunction(parameter);
+            if (CanExecuteFunction != null)
+                return CanExecuteFunction(parameter);
+
+            return true;
         }
 
         public event EventHandler CanExecuteChanged;
