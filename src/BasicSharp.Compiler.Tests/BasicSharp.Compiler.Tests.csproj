@@ -61,7 +61,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Analyzer\AnalyzerTest.cs" />
+    <Compile Include="Analyzer\DebuggingAnalyzerTest.cs" />
+    <Compile Include="Emitter\DebuggingEmitterTest.cs" />
     <Compile Include="Lexer\ChainTest.cs" />
     <Compile Include="Lexer\NumericLiteralTest.cs" />
     <Compile Include="Lexer\StringLiteralTest.cs" />

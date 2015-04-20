@@ -11,7 +11,19 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 {
     public class Parameter : SyntaxNode
     {
-        public PredefinedType Type { get; internal set; }
+        PredefinedType _type;
+        public PredefinedType Type
+        {
+            get { return _type; }
+            internal set
+            {
+                if (_type != value)
+                {
+                    _type = value;
+                    Accept(value);
+                }
+            }
+        }
         public TokenInfo Identifier { get; internal set; }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()

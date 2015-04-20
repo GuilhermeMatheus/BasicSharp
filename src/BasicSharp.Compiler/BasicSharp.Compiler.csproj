@@ -55,6 +55,17 @@
     <Compile Include="Analyzer\CompilationBag.cs" />
     <Compile Include="Analyzer\Specialized\MethodDeclarationAnalyzer.cs" />
     <Compile Include="Analyzer\VariableBag.cs" />
+    <Compile Include="ILEmitter\BlockEmitter.cs" />
+    <Compile Include="ILEmitter\CodeGenerator.cs" />
+    <Compile Include="ILEmitter\Extensions\ExpressionExtensions.cs" />
+    <Compile Include="ILEmitter\Extensions\TypeExtensions.cs" />
+    <Compile Include="ILEmitter\FieldEmitter.cs" />
+    <Compile Include="ILEmitter\MethodEmitter.cs" />
+    <Compile Include="ILEmitter\ModuleEmitter.cs" />
+    <Compile Include="ILEmitter\TacEmitter.cs" />
+    <Compile Include="ILEmitter\Emitter.cs" />
+    <Compile Include="ILEmitter\ImplementsEmitter.cs" />
+    <Compile Include="ILEmitter\TacUnit.cs" />
     <Compile Include="Lexer\Extensions\LexicalExceptions.cs" />
     <Compile Include="Lexer\Extensions\TokenInfoExtensions.cs" />
     <Compile Include="Lexer\Lexer.cs" />
@@ -122,9 +133,7 @@
       <Name>BasicSharp.Utils</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ILEmitter\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

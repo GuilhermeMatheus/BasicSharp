@@ -17,11 +17,24 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
         {
             get { return implementsDirectives.AsReadOnly(); }
         }
-        public ModuleDeclaration Module { get; internal set; }
+        ModuleDeclaration _module;
+        public ModuleDeclaration Module
+        {
+            get { return _module; }
+            internal set
+            {
+                if (_module != value)
+                {
+                    value = _module;
+                    Accept(value);
+                }
+            }
+        }
         
         public void AddImplementsDirective(ImplementsDirective currImplDir)
         {
             implementsDirectives.Add(currImplDir);
+            Accept(currImplDir);
         }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()

@@ -42,5 +42,11 @@ namespace BasicSharp.Compiler.Analyzer
                     where item.Name == accessor.Identifier.StringValue
                     select item).ToList();
         }
+    
+        internal void UpdateInitIndex(string name, int index)
+        {
+            var variable = knowVariables.First(v => v.Name.Equals(name));
+            variable.LocalInitIndex = index;
+        }
     }
 }

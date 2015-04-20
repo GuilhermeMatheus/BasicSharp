@@ -11,6 +11,7 @@ namespace BasicSharp.Compiler
     {
         public Type ClrType { get; set; }
         public string Name { get; set; }
+        public int LocalInitIndex { get; set; }
         public SyntaxNode Definition { get; set; }
     }
 }

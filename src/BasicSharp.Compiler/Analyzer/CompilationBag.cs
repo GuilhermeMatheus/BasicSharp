@@ -22,6 +22,8 @@ namespace BasicSharp.Compiler.Analyzer
         List<Variable> fields = new List<Variable>();
         List<Assembly> assemblies = new List<Assembly>();
 
+        Dictionary<string, List<Assembly>> assemblyCache = new Dictionary<string, List<Assembly>>();
+
         public CompilationUnit CompilationUnit { get; private set; }
         public Project Project { get; private set; }
         public ReadOnlyCollection<Variable> Fields
@@ -32,11 +34,13 @@ namespace BasicSharp.Compiler.Analyzer
         {
             get { return methodStubs.AsReadOnly(); }
         }
+        public AnalyzerManager Analyzer { get; private set; }
 
         public CompilationBag(Project project, CompilationUnit compilationUnit)
         {
             this.Project = project;
             this.CompilationUnit = compilationUnit;
+            this.Analyzer = new AnalyzerManager(this);
 
             initialize();
         }
@@ -60,11 +64,16 @@ namespace BasicSharp.Compiler.Analyzer
         //2. Verifica os assemblies que contém a classe
         public IEnumerable<Assembly> GetAssembliesForClass(string fullClassName)
         {
+            if (assemblyCache.ContainsKey(fullClassName))
+                return assemblyCache[fullClassName];
+
             var result = from ass in assemblies
                          let tuple = new { ass, types = ass.GetTypes() }
                          where tuple.types.Any(t => t.FullName.Equals(fullClassName))
                          select tuple.ass;
-            
+
+            assemblyCache.Add(fullClassName, result.ToList());
+
             return result;
         }
         //3. Verifica se a classe é Sealed e Abstract

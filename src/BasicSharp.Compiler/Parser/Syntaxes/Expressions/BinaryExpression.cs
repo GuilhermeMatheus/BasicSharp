@@ -11,9 +11,33 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 {
     public abstract class BinaryExpression : Expression
     {
-        public Expression LeftSide { get; internal set; }
+        Expression _leftSide;
+        public Expression LeftSide
+        {
+            get { return _leftSide; }
+            internal set
+            {
+                if (_leftSide != value)
+                {
+                    _leftSide = value;
+                    Accept(value);
+                }
+            }
+        }
         public TokenInfo OperatorToken { get; set; }
-        public Expression RightSide { get; internal set; }
+        Expression _rightSide;
+        public Expression RightSide
+        {
+            get { return _rightSide; }
+            internal set
+            {
+                if (_rightSide != value)
+                {
+                    _rightSide = value;
+                    Accept(value);
+                }
+            }
+        }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()
         {

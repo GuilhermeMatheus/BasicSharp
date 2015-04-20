@@ -12,7 +12,19 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
     public class MethodInvocationExpression : Expression
     {
         public TokenInfo MethodName { get; internal set; }
-        public ArgumentList Arguments { get; internal set; }
+        ArgumentList _arguments;
+        public ArgumentList Arguments
+        {
+            get { return _arguments; }
+            internal set
+            {
+                if (_arguments != value)
+                {
+                    _arguments = value;
+                    Accept(value);
+                }
+            }
+        }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()
         {

@@ -10,11 +10,23 @@ using System.Collections;
 
 namespace BasicSharp.Compiler.Parser.Syntaxes
 {
-    public class VariableDeclaration : SyntaxNode 
+    public class VariableDeclaration : SyntaxNode
     {
         List<VariableAssignmentExpression> declarators = new List<VariableAssignmentExpression>();
 
-        public PredefinedType Type { get; internal set; }
+        PredefinedType _type;
+        public PredefinedType Type
+        {
+            get { return _type; }
+            internal set
+            {
+                if (_type != value)
+                {
+                    _type = value;
+                    Accept(value);
+                }
+            }
+        }
         public ReadOnlyCollection<VariableAssignmentExpression> Declarators
         {
             get { return new ReadOnlyCollection<VariableAssignmentExpression>(declarators); }

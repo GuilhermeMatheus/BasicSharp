@@ -24,12 +24,48 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
         }
 
         public TokenInfo Modifier { get; internal set; }
-        public PredefinedType ReturnType { get; internal set; }
+        PredefinedType _returnType;
+        public PredefinedType ReturnType
+        {
+            get { return _returnType; }
+            internal set
+            {
+                if (_returnType != value)
+                {
+                    _returnType = value;
+                    Accept(value);
+                }
+            }
+        }
         public TokenInfo Identifier { get; internal set; }
 
-        public ParameterList ParameterList { get; internal set; }
+        ParameterList _parameterList;
+        public ParameterList ParameterList
+        {
+            get { return _parameterList; }
+            internal set
+            {
+                if (_parameterList != value)
+                {
+                    _parameterList = value;
+                    Accept(value);
+                }
+            }
+        }
 
-        public BlockStatement Block { get; internal set; }
+        BlockStatement _block;
+        public BlockStatement Block
+        {
+            get { return _block; }
+            internal set
+            {
+                if (_block != value)
+                {
+                    _block = value;
+                    Accept(value);
+                }
+            }
+        }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()
         {

@@ -13,7 +13,7 @@ using BasicSharp.Compiler.Analyzer;
 namespace BasicSharp.Compiler.Tests.Lexer
 {
 	[TestClass]
-	public class AnalyzerTest
+	public class DebuggingAnalyzerTest
 	{
 		[TestMethod]
 		public void AnalysisResultsTests()

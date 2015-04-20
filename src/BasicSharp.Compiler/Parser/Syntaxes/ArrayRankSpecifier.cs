@@ -10,7 +10,19 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
     public class ArrayRankSpecifier : SyntaxNode
     {
         public TokenInfo OpenBracketToken { get; internal set; }
-        public Expression Value { get; internal set; }
+        Expression _value;
+        public Expression Value
+        {
+            get { return _value; }
+            internal set
+            {
+                if (_value != value)
+                {
+                    _value = value;
+                    Accept(value);
+                }
+            }
+        }
         public TokenInfo CloseBracketToken { get; set; }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()

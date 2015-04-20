@@ -65,5 +65,10 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
         {
             get { return GetType().Name; }
         }
+
+        protected void Accept(SyntaxNode node)
+        {
+            node.Parent = this;
+        }
     }
 }

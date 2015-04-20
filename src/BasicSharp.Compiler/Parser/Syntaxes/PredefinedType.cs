@@ -11,7 +11,19 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
     public class PredefinedType : SyntaxNode
     {
         public TokenInfo TypeToken { get; internal set; }
-        public ArrayRankSpecifier ArraySpecifier { get; internal set; }
+        ArrayRankSpecifier _arraySpecifier;
+        public ArrayRankSpecifier ArraySpecifier
+        {
+            get { return _arraySpecifier; }
+            internal set
+            {
+                if (_arraySpecifier != value)
+                {
+                    _arraySpecifier = value;
+                    Accept(value);
+                }
+            }
+        }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()
         {

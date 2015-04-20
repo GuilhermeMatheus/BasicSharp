@@ -26,6 +26,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
         public void AddParameter(Parameter parameter)
         {
             this.parameters.Add(parameter);
+            Accept(parameter);
         }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()

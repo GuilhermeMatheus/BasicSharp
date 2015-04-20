@@ -14,8 +14,32 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
         public TokenInfo OpenParenToken { get; internal set; }
         public TokenInfo CloseParenToken { get; internal set; }
 
-        public Expression Condition { get; internal set; }
-        public BlockStatement Block { get; internal set; }
+        Expression _condition;
+        public Expression Condition
+        {
+            get { return _condition; }
+            internal set
+            {
+                if (_condition != value)
+                {
+                    _condition = value;
+                    Accept(value);
+                }
+            }
+        }
+        BlockStatement _block;
+        public BlockStatement Block
+        {
+            get { return _block; }
+            internal set
+            {
+                if (_block != value)
+                {
+                    _block = value;
+                    Accept(value);
+                }
+            }
+        }
 
         public override IEnumerable GetChilds()
         {

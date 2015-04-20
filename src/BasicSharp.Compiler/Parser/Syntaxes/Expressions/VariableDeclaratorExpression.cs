@@ -11,7 +11,19 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
     public class VariableAssignmentExpression : Expression
     {
         public TokenInfo Identifier { get; set; }
-        public AssignmentExpression Assignment { get; set; }
+        AssignmentExpression _assignment;
+        public AssignmentExpression Assignment
+        {
+            get { return _assignment; }
+            internal set
+            {
+                if (_assignment != value)
+                {
+                    _assignment = value;
+                    Accept(value);
+                }
+            }
+        }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()
         {

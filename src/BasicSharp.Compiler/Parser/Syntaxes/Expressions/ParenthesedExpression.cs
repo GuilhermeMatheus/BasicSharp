@@ -11,7 +11,19 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
     public class ParenthesedExpression : Expression
     {
         public TokenInfo OpenParenToken { get; internal set; }
-        public Expression InnerExpression { get; internal set; }
+        Expression _innerExpression;
+        public Expression InnerExpression
+        {
+            get { return _innerExpression; }
+            internal set
+            {
+                if (_innerExpression != value)
+                {
+                    _innerExpression = value;
+                    Accept(value);
+                }
+            }
+        }
         public TokenInfo CloseParenToken { get; internal set; }
 
         public override IEnumerable<Lexer.TokenInfo> GetInternalTokens()

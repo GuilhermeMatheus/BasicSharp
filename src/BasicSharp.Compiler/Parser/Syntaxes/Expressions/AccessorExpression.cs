@@ -11,7 +11,19 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
     public class AccessorExpression : Expression
     {
         public TokenInfo Identifier { get; internal set; }
-        public BracketedArgument BracketedArgument { get; internal set; }
+        BracketedArgument _bracketedArgument;
+        public BracketedArgument BracketedArgument
+        {
+            get { return _bracketedArgument; }
+            internal set
+            {
+                if (_bracketedArgument != value)
+                {
+                    _bracketedArgument = value;
+                    Accept(value);
+                }
+            }
+        }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()
         {

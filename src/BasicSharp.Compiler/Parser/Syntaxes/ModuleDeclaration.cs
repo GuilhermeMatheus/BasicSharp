@@ -26,6 +26,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
         public void AddMember(ModuleMemberDeclaration member)
         {
             members.Add(member);
+            Accept(member);
         }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()

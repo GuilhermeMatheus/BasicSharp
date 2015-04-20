@@ -16,9 +16,9 @@ namespace BasicSharp.Compiler.Analyzer
 
         readonly Dictionary<SyntaxNode, VariableBag> bagFromNode = new Dictionary<SyntaxNode, VariableBag>();
         
-        public AnalyzerManager(Project project, CompilationUnit compilationUnit)
+        public AnalyzerManager(CompilationBag compilationBag)
         {
-            this.CompilationBag = new CompilationBag(project, compilationUnit);
+            this.CompilationBag = compilationBag;
         }
 
         public List<AnalysisResult> GetAnalysisForCompilationUnit()
@@ -29,6 +29,12 @@ namespace BasicSharp.Compiler.Analyzer
                                   .ToList();
         }
 
+        public void SetLocalInitIndex(VariableAssignmentExpression node, int index)
+        {
+            var bag = AskForBag(node);
+            bag.UpdateInitIndex(node.Identifier.StringValue, index);
+
+        }
         public VariableBag AskForBag(SyntaxNode child)
         {
             var p = child.Parent;

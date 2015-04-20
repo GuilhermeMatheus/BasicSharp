@@ -24,6 +24,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
         public void AddStatement(Statement statement)
         {
             statements.Add(statement);
+            Accept(statement);
         }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()

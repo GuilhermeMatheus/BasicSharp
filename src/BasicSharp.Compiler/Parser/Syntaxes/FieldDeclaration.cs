@@ -17,7 +17,19 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 
         public TokenInfo Modifier { get; internal set; }
 
-        public VariableDeclaration Declaration { get; internal set; }
+        VariableDeclaration _declaration;
+        public VariableDeclaration Declaration
+        {
+            get { return _declaration; }
+            internal set
+            {
+                if (_declaration != value)
+                {
+                    _declaration = value;
+                    Accept(value);
+                }
+            }
+        }
 
         public TokenInfo SemicolonToken { get; internal set; }
 

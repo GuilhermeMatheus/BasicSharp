@@ -23,6 +23,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 
         public void AddArgument(Argument argument)
         {
+            Accept(argument);
             arguments.Add(argument);
         }
 

@@ -10,7 +10,19 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 {
     public class MethodInvocationStatement : Statement
     {
-        public MethodInvocationExpression MethodInvocation { get; internal set; }
+        MethodInvocationExpression _methodInvocation;
+        public MethodInvocationExpression MethodInvocation
+        {
+            get { return _methodInvocation; }
+            internal set
+            {
+                if (_methodInvocation != value)
+                {
+                    _methodInvocation = value;
+                    Accept(value);
+                }
+            }
+        }
         public TokenInfo SemicolonToken { get; internal set; }
 
         public override IEnumerable GetChilds()

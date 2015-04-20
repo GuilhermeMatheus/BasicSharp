@@ -10,7 +10,19 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
 {
     public class Argument : SyntaxNode
     {
-        public Expression Expression { get; internal set; }
+        Expression _expression;
+        public Expression Expression
+        {
+            get { return _expression; }
+            internal set
+            {
+                if (_expression != value)
+                {
+                    _expression = value;
+                    Accept(value);
+                }
+            }
+        }
 
         public override IEnumerable<TokenInfo> GetInternalTokens()
         {
