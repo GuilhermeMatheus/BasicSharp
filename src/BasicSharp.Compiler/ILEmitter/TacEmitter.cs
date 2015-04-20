@@ -11,22 +11,25 @@ namespace BasicSharp.Compiler.ILEmitter
     public abstract class TacEmitter<T> : Emitter<T>
         where T : SyntaxNode
     {
-        public string PreferredFirstLabel { get; private set; }
+        protected ILocalIndexer localIndexer;
 
-        public TacEmitter(CompilationBag compilationBag)
-            : base(compilationBag) { }
-
-        public void SetPreferredFirstLabel(string label)
+        public TacEmitter(CompilationBag compilationBag, ILocalIndexer localIndexer)
+            : base(compilationBag)
         {
-            this.PreferredFirstLabel = label;
+            this.localIndexer = localIndexer;
         }
-        
+
         public abstract List<TacUnit> Generate(T node, string labelPrefix = "IL_", int index = 0);
 
         public override void BuildString(StringBuilder builder, T node)
         {
             foreach (var item in Generate(node))
                 builder.AppendLine(item.ToString());
+        }
+
+        protected string GetLabel(string prefix, int index)
+        {
+            return prefix + index.ToString().PadLeft(4, '0');
         }
     }
 }

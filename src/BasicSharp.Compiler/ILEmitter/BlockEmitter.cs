@@ -9,8 +9,8 @@ namespace BasicSharp.Compiler.ILEmitter
 {
     public class BlockEmitter : TacEmitter<BlockStatement>
     {
-        public BlockEmitter(CompilationBag compilationBag)
-            : base(compilationBag) { }
+        public BlockEmitter(CompilationBag compilationBag, ILocalIndexer localIndexer)
+            : base(compilationBag, localIndexer) { }
 
 
 
@@ -19,19 +19,4 @@ namespace BasicSharp.Compiler.ILEmitter
             throw null;   
         }
     }
-
-    public class ExpressionEmitter : TacEmitter<Expression>
-    {
-        public ExpressionEmitter(CompilationBag compilationBag)
-            : base(compilationBag) { }
-
-        public override List<TacUnit> Generate(Expression node, string labelPrefix = "IL_", int index = 0)
-        {
-            var result = new List<TacUnit>();
-
-
-            return result;
-        }
-    }
-
 }

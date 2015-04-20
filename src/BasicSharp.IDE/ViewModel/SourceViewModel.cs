@@ -113,7 +113,8 @@ namespace BasicSharp.IDE.ViewModel
 
             try
             {
-                var analyzer = new AnalyzerManager(project, parsedSyntax as CompilationUnit);
+                var bag = new CompilationBag(project, parsedSyntax as CompilationUnit);
+                var analyzer = bag.Analyzer;
                 foreach (var item in analyzer.GetAnalysisForCompilationUnit())
                     Errors.Add(item.MessageResult);
             }

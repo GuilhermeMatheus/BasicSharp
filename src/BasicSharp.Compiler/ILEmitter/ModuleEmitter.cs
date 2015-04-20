@@ -65,8 +65,6 @@ namespace BasicSharp.Compiler.ILEmitter
 
             builder.AppendLine(CTOR_HEADER);
 
-            var tacs = new List<TacUnit>();
-
             var i = 0;
             foreach (var item in fields)
             {
@@ -81,20 +79,29 @@ namespace BasicSharp.Compiler.ILEmitter
 
                 foreach (var d in declarators)
                 {
-                    var load_label = string.Format("IL_{0}", (++i).ToString().PadLeft(4, '0'));
                     var load_value = Convert.ChangeType(d.Assignment.GetLiteralExpressionValue(), type);
                     
                     if (type == typeof(bool))
                         load_value = ((bool)load_value) ? "1" : "0";
 
-                    var load_TAC = new TacUnit { Label = load_label, Op = load_opcode, Value = load_value.ToString() };
-                    tacs.Add(load_TAC);
+                    var load_TAC = new TacUnit
+                    {
+                        LabelPrefix = "IL_",
+                        LabelIndex = ++i,
+                        Op = load_opcode,
+                        Value = load_value.ToString()
+                    };
+
                     builder.AppendLine(load_TAC.ToString());
 
-                    var stsfld_label = string.Format("IL_{0}", (++i).ToString().PadLeft(4, '0'));
                     var stsfld_value = string.Format("{0} {1}::{2}", msil_typeName, className, d.Identifier.StringValue);
-                    var stsfld_TAC = new TacUnit { Label = stsfld_label, Op = stsfld_opcode, Value = stsfld_value };
-                    tacs.Add(stsfld_TAC);
+                    var stsfld_TAC = new TacUnit
+                    {
+                        LabelPrefix = "IL_",
+                        LabelIndex = ++i,
+                        Op = stsfld_opcode,
+                        Value = stsfld_value
+                    };
                     builder.AppendLine(stsfld_TAC.ToString());
                 }
                 builder.AppendLine();

@@ -48,7 +48,8 @@ module helloProgram
 			};
 			
 			var syntax = ParserFactory.FromString(source).GetSyntax() as CompilationUnit;
-			var result = new AnalyzerManager(project, syntax).GetAnalysisForCompilationUnit();
+            var bag = new CompilationBag(project, syntax);
+			var result = bag.Analyzer.GetAnalysisForCompilationUnit();
 
 			result.ToString();
 

@@ -9,7 +9,7 @@ using System.Text;
 
 namespace BasicSharp.Compiler.ILEmitter
 {
-    public class MethodEmitter : Emitter<MethodDeclaration>
+    public class MethodEmitter : Emitter<MethodDeclaration>, ILocalIndexer
     {
         #region consts
         const string ACCESSOR_MODIFIER = "<ACCESSOR_MODIFIER>";
@@ -22,8 +22,18 @@ namespace BasicSharp.Compiler.ILEmitter
         const string LOCAL_SPECIFIER = "    [{0}] {1}";
         #endregion
 
+        Dictionary<string, int> indexByLocalInit = new Dictionary<string, int>();
+
         public MethodEmitter(CompilationBag compilationBag)
             : base(compilationBag) { }
+
+        public int GetLocalIndex(string name)
+        {
+            if (indexByLocalInit.ContainsKey(name))
+                return indexByLocalInit[name];
+            
+            return -1;
+        }
 
         public override void BuildString(StringBuilder builder, MethodDeclaration node)
         {
@@ -34,9 +44,12 @@ namespace BasicSharp.Compiler.ILEmitter
             var locals = node.Childs.OfType<VariableDeclaration>();
             writeLocals(builder, locals);
             builder.AppendLine();
-            
 
-            
+            var statements = node.Block.Statements;
+            var statEmitter = new StatementEmitter(compilationBag, (ILocalIndexer)this);
+            foreach (var item in statements)
+                statEmitter.BuildString(builder, item);
+
             //MethodHeader closeBrace
             builder.AppendLine("}");
         }
@@ -56,7 +69,8 @@ namespace BasicSharp.Compiler.ILEmitter
                 foreach (var decl in item.Declarators)
                 {
                     localsInit.Add(string.Format(LOCAL_SPECIFIER, i++, type));
-                    compilationBag.Analyzer.SetLocalInitIndex(decl, i);
+                    indexByLocalInit.Add(decl.Identifier.StringValue, i);
+                    //compilationBag.Analyzer.SetLocalInitIndex(decl, i);
                 }
             }
 
@@ -66,7 +80,6 @@ namespace BasicSharp.Compiler.ILEmitter
 
             builder.AppendLine(")");
         }
-
-
+                
     }
 }
