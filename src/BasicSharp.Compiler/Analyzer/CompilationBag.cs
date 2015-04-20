@@ -161,6 +161,18 @@ namespace BasicSharp.Compiler.Analyzer
         }
         #endregion
 
+        public MethodDeclaration GetInternalMethodDefinition(MethodInvocationExpression call)
+        {
+            var methods = from item in MethodStubs
+                          where item.IsInternal && item.Name.Equals(call.MethodName.StringValue)
+                          select item;
+
+            if (!methods.Any())
+                return null;
+
+            return methods.First().InternalDefinition;
+        }
+
         void loadField()
         {
             var declarators = from item in CompilationUnit.Module.Members
@@ -185,7 +197,6 @@ namespace BasicSharp.Compiler.Analyzer
 
             this.fields.AddRange(result);
         }
-    
-    
+       
     }
 }

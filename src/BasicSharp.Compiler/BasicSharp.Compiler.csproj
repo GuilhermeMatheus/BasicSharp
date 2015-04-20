@@ -59,12 +59,14 @@
     <Compile Include="ILEmitter\CodeGenerator.cs" />
     <Compile Include="ILEmitter\ExpressionEmitter.cs" />
     <Compile Include="ILEmitter\Extensions\ExpressionExtensions.cs" />
+    <Compile Include="ILEmitter\Extensions\TacUnitExtensions.cs" />
     <Compile Include="ILEmitter\Extensions\TypeExtensions.cs" />
     <Compile Include="ILEmitter\FieldEmitter.cs" />
     <Compile Include="ILEmitter\ForEmitter.cs" />
     <Compile Include="ILEmitter\IfEmitter.cs" />
     <Compile Include="ILEmitter\ILocalIndexer.cs" />
     <Compile Include="ILEmitter\MethodEmitter.cs" />
+    <Compile Include="ILEmitter\MethodInvocationEmitter.cs" />
     <Compile Include="ILEmitter\ModuleEmitter.cs" />
     <Compile Include="ILEmitter\StatementEmitter.cs" />
     <Compile Include="ILEmitter\TacEmitter.cs" />

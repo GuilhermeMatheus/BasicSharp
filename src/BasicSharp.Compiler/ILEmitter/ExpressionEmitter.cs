@@ -17,7 +17,10 @@ namespace BasicSharp.Compiler.ILEmitter
         {
             var result = new List<TacUnit>();
 
-
+            if (node is MethodInvocationExpression)
+            {
+                var methodInvocation = new MethodInvocationEmitter(compilationBag, localIndexer);
+            }
 
             return result;
         }

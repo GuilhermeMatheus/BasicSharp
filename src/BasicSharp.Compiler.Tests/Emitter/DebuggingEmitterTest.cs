@@ -19,9 +19,9 @@ namespace BasicSharp.Compiler.Tests.Emitter
 	public class DebuggingEmitterTest
 	{
 		[TestMethod]
-        public void EmitterTests()
+		public void EmitterTests()
 		{
-            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
+			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
 
 
 			var source = @"
