@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace BasicSharp.Compiler.ILEmitter
 {
     public class LocalInfo

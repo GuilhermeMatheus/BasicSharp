@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace BasicSharp.Compiler.ILEmitter
 {
-    public abstract class ExpressionEmitter<T> : TacEmitter<T>, IExpressionEmitter
-        where T : Expression
+    public abstract class ExpressionEmitter<T> : TacEmitter<T>, ITacEmitter
+        where T : SyntaxNode
     {
         public ExpressionEmitter(CompilationBag compilationBag, ILocalIndexer localIndexer)
             : base(compilationBag, localIndexer) { }
 
-        public Tuple<Type, List<TacUnit>> GenerateWithType(Expression node, string labelPrefix = "IL_", int index = 0)
+        public Tuple<Type, List<TacUnit>> GenerateTypeTac(SyntaxNode node, string labelPrefix = "IL_", int index = 0)
         {
             return GenerateWithType(node as T, labelPrefix, index);
         }
@@ -24,6 +24,5 @@ namespace BasicSharp.Compiler.ILEmitter
         {
             return GenerateWithType(node, labelPrefix, index).Item2;
         }
-
     }
 }

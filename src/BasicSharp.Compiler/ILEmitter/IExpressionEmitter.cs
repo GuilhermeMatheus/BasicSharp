@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 namespace BasicSharp.Compiler.ILEmitter
 {
-    public interface IExpressionEmitter
+    public interface ITacEmitter
     {
-        Tuple<Type, List<TacUnit>> GenerateWithType(Expression node, string labelPrefix = "IL_", int index = 0);
+        Tuple<Type, List<TacUnit>> GenerateTypeTac(SyntaxNode node, string labelPrefix = "IL_", int index = 0);
     }
 }

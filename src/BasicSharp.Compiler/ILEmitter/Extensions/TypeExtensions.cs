@@ -41,6 +41,9 @@ namespace BasicSharp.Compiler.ILEmitter.Extensions
             if (type == typeof(bool[]))
                 return "bool[]";
 
+            if (type == typeof(void))
+                return "void";
+
             throw new ArgumentException("type");
         }
 

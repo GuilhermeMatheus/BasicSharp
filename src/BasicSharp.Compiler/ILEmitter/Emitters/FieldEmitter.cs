@@ -11,7 +11,7 @@ namespace BasicSharp.Compiler.ILEmitter
 {
     public class FieldEmitter : Emitter<FieldDeclaration>
     {
-        const string FORMAT = ".field {0} static {1} {2}\n";
+        const string FORMAT = "    .field {0} static {1} {2}\n";
         
         public FieldEmitter(CompilationBag compilationBag)
             : base(compilationBag) { }

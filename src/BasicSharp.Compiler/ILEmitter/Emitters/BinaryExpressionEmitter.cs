@@ -12,7 +12,7 @@ using System.Diagnostics.Contracts;
 namespace BasicSharp.Compiler.ILEmitter
 {
     public class BinaryExpressionEmitter<T> : ExpressionEmitter<T>
-            where T : Expression
+            where T : SyntaxNode
     {
         static readonly Type[] COMPOSITE_TYPES = { 
                                                      typeof(ExclamationEqualsExpression),         //ceq
@@ -31,12 +31,12 @@ namespace BasicSharp.Compiler.ILEmitter
 
             var result = new List<TacUnit>();
             
-            var left = ExpressionEmitterFactory.GenerateWithType(node.RightSide, compilationBag, localIndexer, labelPrefix, index);
+            var left = TacEmitterFactory.GenerateWithNode(node.LeftSide, compilationBag, localIndexer, labelPrefix, index);
 
             result.AddRange(left.Item2);
             index = result.GetNextLabel().Item2;
 
-            var right = ExpressionEmitterFactory.GenerateWithType(node.RightSide, compilationBag, localIndexer, labelPrefix, index);
+            var right = TacEmitterFactory.GenerateWithNode(node.RightSide, compilationBag, localIndexer, labelPrefix, index);
 
             result.AddRange(right.Item2);
             var label = result.GetNextLabel();

@@ -55,7 +55,7 @@ namespace BasicSharp.Compiler.ILEmitter
                     break;
                 case SyntaxKind.DoubleLiteral:
                     typeResult = typeof(double);
-                    tac.Op = OpCodes.Ldc_I4;
+                    tac.Op = OpCodes.Ldc_R8;
                     tac.Value = node.Value.DoubleValue.ToString();
                     break;
                 case SyntaxKind.ByteLiteral:

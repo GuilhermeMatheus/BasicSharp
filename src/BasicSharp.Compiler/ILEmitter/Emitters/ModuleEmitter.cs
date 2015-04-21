@@ -36,6 +36,8 @@ namespace BasicSharp.Compiler.ILEmitter
             var fields = node.Members.Where(m => m.GetType() == typeof(FieldDeclaration))
                                      .Cast<FieldDeclaration>();
 
+            builder.AppendLine();
+
             foreach (var item in fields)
                 fieldEmitter.BuildString(builder, item);
 
@@ -52,7 +54,6 @@ namespace BasicSharp.Compiler.ILEmitter
 
             builder.AppendLine("}"); //CloseBrace de ClassHeader
         }
-
 
         void buildConstructor(StringBuilder builder, IEnumerable<FieldDeclaration> fields, string className)
         {
@@ -104,8 +105,15 @@ namespace BasicSharp.Compiler.ILEmitter
                     };
                     builder.AppendLine(stsfld_TAC.ToString());
                 }
-                builder.AppendLine();
             }
+
+            var ret = new TacUnit
+            {
+                LabelPrefix = "IL_",
+                LabelIndex = ++i,
+                Op = OpCodes.Ret,
+            };
+            builder.AppendLine(ret.ToString());
 
             builder.AppendLine("}"); //CloseBrace de CtorHeader
         }

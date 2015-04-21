@@ -5,37 +5,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
+using BasicSharp.Compiler.ILEmitter.Extensions;
 
 namespace BasicSharp.Compiler.ILEmitter
 {
-    public class WhileEmitter : TacEmitter<WhileStatement>
+    public class WhileEmitter : ExpressionEmitter<WhileStatement>
     {
         public WhileEmitter(CompilationBag compilationBag, ILocalIndexer localIndexer)
             : base(compilationBag, localIndexer) { }
 
-        public override List<TacUnit> Generate(WhileStatement node, string labelPrefix = "IL_", int index = 0)
+        public override Tuple<Type, List<TacUnit>> GenerateWithType(WhileStatement node, string labelPrefix = "IL_", int index = 0)
         {
             var result = new List<TacUnit>();
 
-            var conditionEmitter = ExpressionEmitterFactory.GetEmitterFor(node.Condition, compilationBag, localIndexer);
-            var condition = conditionEmitter.GenerateWithType(node.Condition, labelPrefix, index);
+            var conditionEmitter = TacEmitterFactory.GetEmitterFor(node.Condition, compilationBag, localIndexer);
+            var condition = conditionEmitter.GenerateTypeTac(node.Condition, labelPrefix, index);
 
             result.AddRange(condition.Item2);
+            index = result.GetNextLabel().Item2;
 
             var brFalse = new TacUnit
             {
                 LabelPrefix = labelPrefix,
-                LabelIndex = condition.Item2.Last().LabelIndex + 1,
+                LabelIndex = index++,
                 Op = OpCodes.Brfalse
             };
 
-            var blockEmitter = new StatementEmitter(compilationBag, localIndexer);
-            var block = blockEmitter.Generate(node.Block, labelPrefix, brFalse.LabelIndex + 1);
+            var block = TacEmitterFactory.GenerateWithNode(node.Block, compilationBag, localIndexer, labelPrefix, index);
 
             var brCondition = new TacUnit
             {
                 LabelPrefix = labelPrefix,
-                LabelIndex = block.Last().LabelIndex + 1,
+                LabelIndex = block.Item2.GetNextLabel().Item2,
                 Op = OpCodes.Br,
                 Value = GetLabel(condition.Item2.First().LabelPrefix, condition.Item2.First().LabelIndex)
             };
@@ -43,10 +44,10 @@ namespace BasicSharp.Compiler.ILEmitter
             brFalse.Value = GetLabel(brCondition.LabelPrefix, brCondition.LabelIndex + 1);
 
             result.Add(brFalse);
-            result.AddRange(block);
+            result.AddRange(block.Item2);
             result.Add(brCondition);
 
-            return result;
+            return new Tuple<Type,List<TacUnit>>(null, result);
         }
     }
 }

@@ -35,14 +35,19 @@ module helloProgram
 
 	my void Main()
 	{
-		if (d > 10)
-		{
-			WriteLine(""maior que 10"");
-		}
-		else
-		{
-			WriteLine(""menor que 10"");
-		}
+		string nome = ReadLine(""Digite seu nome"");
+		Write(""Olá "");
+		Write(nome);
+		Write(""!"");
+
+		//if (d > 10.087987)
+		//{
+		//	WriteLine(""maior que 10"");
+		//}
+		//else
+		//{
+		//	WriteLine(""menor que 10"");
+		//}
 	}
 }";
 

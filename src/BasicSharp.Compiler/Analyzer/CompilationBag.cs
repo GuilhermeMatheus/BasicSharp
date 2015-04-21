@@ -169,11 +169,9 @@ namespace BasicSharp.Compiler.Analyzer
 
         public List<MethodInfo> GetExternalMethodsFromSession(MethodInvocationExpression call, IEnumerable<Type> parameters)
         {
-            var methods = from item in sessionTypes.SelectMany(m => m.GetMethods(BindingFlags.Static | BindingFlags.Public))
-                          where item.Name.Equals(call.MethodName.StringValue) &&
-                                item.GetParameters().Select(p => p.ParameterType).ToArray().Equals(parameters.ToArray())
-                          select item;
-
+            var methods = from item in sessionTypes
+                          select item.GetMethod(call.MethodName.StringValue, parameters.ToArray());
+            
             return methods.ToList();
         }
 

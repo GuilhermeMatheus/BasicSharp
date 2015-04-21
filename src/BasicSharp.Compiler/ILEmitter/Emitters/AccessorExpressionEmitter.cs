@@ -48,7 +48,8 @@ namespace BasicSharp.Compiler.ILEmitter
                 tac.Op = OpCodes.Ldsfld;
                 tac.Value = string.Format(LOAD_FIELD_FORMAT, typeResult.GetMsilTypeName(), memberName, name);
             }
-
+            
+            result.Add(tac);
             return new Tuple<Type, List<TacUnit>>(typeResult, result);
         }
     }

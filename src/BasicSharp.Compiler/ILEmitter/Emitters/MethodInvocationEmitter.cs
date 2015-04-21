@@ -17,7 +17,7 @@ namespace BasicSharp.Compiler.ILEmitter
 
         public MethodInvocationEmitter(CompilationBag compilationBag, ILocalIndexer localIndexer)
             : base(compilationBag, localIndexer) { }
-        
+
         public override Tuple<Type, List<TacUnit>> GenerateWithType(MethodInvocationExpression node, string labelPrefix = "IL_", int index = 0)
         {
             Tuple<string, int> label = new Tuple<string, int>(labelPrefix, index);
@@ -27,8 +27,8 @@ namespace BasicSharp.Compiler.ILEmitter
 
             foreach (var item in node.Arguments.Arguments)
             {
-                var expressionEmitter = ExpressionEmitterFactory.GetEmitterFor(item.Expression, compilationBag, localIndexer);
-                var typeAndTac = expressionEmitter.GenerateWithType(item.Expression, label.Item1, label.Item2);
+                var expressionEmitter = TacEmitterFactory.GetEmitterFor(item.Expression, compilationBag, localIndexer);
+                var typeAndTac = expressionEmitter.GenerateTypeTac(item.Expression, label.Item1, label.Item2);
                 
                 argsType.Add(typeAndTac.Item1);
                 result.AddRange(typeAndTac.Item2);
@@ -58,7 +58,7 @@ namespace BasicSharp.Compiler.ILEmitter
                 returnType = method.ReturnType;
                 var msilType = returnType.GetMsilTypeName();
                 var sourceAssembly = method.ReflectedType.Assembly.GetName().Name;
-                var sourceType = method.ReflectedType.GetMsilTypeName();
+                var sourceType = method.ReflectedType.FullName;
 
                 value = string.Format(EXTERNAL_CALL_VALUE, msilType, sourceAssembly, sourceType, node.MethodName.StringValue, _params);
             }
