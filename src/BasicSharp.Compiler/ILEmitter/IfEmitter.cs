@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
+using BasicSharp.Compiler.ILEmitter.Extensions;
 
 namespace BasicSharp.Compiler.ILEmitter
 {
@@ -18,11 +19,11 @@ namespace BasicSharp.Compiler.ILEmitter
             var rand = new Random();
             var result = new List<TacUnit>();
 
-            var conditionEmitter = new ExpressionEmitter(compilationBag, localIndexer);
-            var condition = conditionEmitter.Generate(node.Condition, labelPrefix, index);
+            var conditionEmitter = ExpressionEmitterFactory.GetEmitterFor(node.Condition, compilationBag, localIndexer);
+            var condition = conditionEmitter.GenerateWithType(node.Condition, labelPrefix, index);
             
-            result.AddRange(condition);
-            index = condition.Last().LabelIndex + 1;
+            result.AddRange(condition.Item2);
+            index = result.GetNextLabel().Item2;
 
             var brF = new TacUnit
             {

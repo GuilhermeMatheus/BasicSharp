@@ -2,6 +2,7 @@
 using BasicSharp.Compiler.Parser.Syntaxes;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,11 @@ namespace BasicSharp.Compiler.ILEmitter
 
         CompilationBag bag;
         CompilationUnit compilationUnit;
+
+        static CodeGenerator()
+        {
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
+        }
 
         public CodeGenerator(CompilationBag bag, CompilationUnit compilationUnit)
         {

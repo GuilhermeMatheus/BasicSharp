@@ -17,9 +17,9 @@ namespace BasicSharp.Compiler.ILEmitter
         {
             var result = new List<TacUnit>();
 
-            var expressionEmitter = new ExpressionEmitter(compilationBag, localIndexer);
-            var initializer = expressionEmitter.Generate(node.Initializer, labelPrefix, index);
-            result.AddRange(initializer);
+            var expressionEmitter = ExpressionEmitterFactory.GetEmitterFor(node.Initializer, compilationBag, localIndexer);
+            var initializer = expressionEmitter.GenerateWithType(node.Initializer, labelPrefix, index);
+            result.AddRange(initializer.Item2);
 
             index = result.Last().LabelIndex + 1;
 
@@ -29,13 +29,13 @@ namespace BasicSharp.Compiler.ILEmitter
 
             index = result.Last().LabelIndex + 1;
 
-            var incrementor = expressionEmitter.Generate(node.Incrementor, labelPrefix, index);
-            result.AddRange(incrementor);
+            var incrementor = expressionEmitter.GenerateWithType(node.Incrementor, labelPrefix, index);
+            result.AddRange(incrementor.Item2);
 
             index = result.Last().LabelIndex + 1;
 
-            var condition = expressionEmitter.Generate(node.Condition, labelPrefix, index);
-            result.AddRange(condition);
+            var condition = expressionEmitter.GenerateWithType(node.Condition, labelPrefix, index);
+            result.AddRange(condition.Item2);
 
             index = result.Last().LabelIndex + 1;
 
@@ -44,7 +44,7 @@ namespace BasicSharp.Compiler.ILEmitter
                 LabelPrefix = labelPrefix,
                 LabelIndex = index,
                 Op = OpCodes.Brtrue,
-                Value = GetLabel(initializer.First().LabelPrefix, initializer.First().LabelIndex)
+                Value = GetLabel(initializer.Item2.First().LabelPrefix, initializer.Item2.First().LabelIndex)
             };
 
             result.Add(brTrue);

@@ -3,6 +3,7 @@ using BasicSharp.Compiler.Parser.Syntaxes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -66,6 +67,39 @@ namespace BasicSharp.Compiler.ILEmitter.Extensions
                 return (expression as AssignmentExpression).Expression.GetLiteralExpressionValue();
 
             throw new NotImplementedException();
+        }
+    
+        public static OpCode GetOpCodeForBinaryExpression<T>(this T expression)
+            where T : BinaryExpression
+        {
+            switch (expression.OperatorToken.Kind)
+            {
+                case SyntaxKind.EqualsEqualsOperator:
+                case SyntaxKind.ExclamationEqualsToken:
+                    return OpCodes.Ceq;
+                case SyntaxKind.MinorOperator:
+                case SyntaxKind.MajorEqualsOperator:
+                    return OpCodes.Clt;
+                case SyntaxKind.MinorEqualsOperator:
+                case SyntaxKind.MajorOperator:
+                    return OpCodes.Cgt;
+                case SyntaxKind.OrOperator:
+                    return OpCodes.Or;
+                case SyntaxKind.AndOperator:
+                    return OpCodes.And;
+                case SyntaxKind.ModOperator:
+                    return OpCodes.Rem;
+                case SyntaxKind.PlusToken:
+                    return OpCodes.Add;
+                case SyntaxKind.MinusToken:
+                    return OpCodes.Sub;
+                case SyntaxKind.AsteriskToken:
+                    return OpCodes.Mul;
+                case SyntaxKind.SlashToken:
+                    return OpCodes.Div;
+                default:
+                    throw new ArgumentException("expression.OperatorToken.Kind");
+            }
         }
     }
 }

@@ -22,17 +22,17 @@ namespace BasicSharp.Compiler.ILEmitter
         const string LOCAL_SPECIFIER = "    [{0}] {1}";
         #endregion
 
-        Dictionary<string, int> indexByLocalInit = new Dictionary<string, int>();
+        Dictionary<string, LocalInfo> indexByLocalInit = new Dictionary<string, LocalInfo>();
 
         public MethodEmitter(CompilationBag compilationBag)
             : base(compilationBag) { }
 
-        public int GetLocalIndex(string name)
+        public LocalInfo GetLocalInfo(string name)
         {
             if (indexByLocalInit.ContainsKey(name))
                 return indexByLocalInit[name];
             
-            return -1;
+            return null;
         }
 
         public override void BuildString(StringBuilder builder, MethodDeclaration node)
@@ -50,7 +50,6 @@ namespace BasicSharp.Compiler.ILEmitter
             foreach (var item in statements)
                 statEmitter.BuildString(builder, item);
 
-            //MethodHeader closeBrace
             builder.AppendLine("}");
         }
 
@@ -65,12 +64,20 @@ namespace BasicSharp.Compiler.ILEmitter
             var localsInit = new List<string>();
             foreach (var item in locals)
             {
-                var type = item.Type.GetCLRType().GetMsilTypeName();
+                var type = item.Type.GetCLRType();
                 foreach (var decl in item.Declarators)
                 {
-                    localsInit.Add(string.Format(LOCAL_SPECIFIER, i++, type));
-                    indexByLocalInit.Add(decl.Identifier.StringValue, i);
-                    //compilationBag.Analyzer.SetLocalInitIndex(decl, i);
+                    localsInit.Add(string.Format(LOCAL_SPECIFIER, i++, type.GetMsilTypeName()));
+
+                    var var = new Variable
+                    {
+                        ClrType = type,
+                        Definition = decl,
+                        Name = decl.Identifier.StringValue,
+                        LocalInitIndex = i
+                    };
+
+                    indexByLocalInit.Add(decl.Identifier.StringValue, new LocalInfo { Index = i, Variable = var });
                 }
             }
 
@@ -80,6 +87,8 @@ namespace BasicSharp.Compiler.ILEmitter
 
             builder.AppendLine(")");
         }
-                
+
+
+        
     }
 }

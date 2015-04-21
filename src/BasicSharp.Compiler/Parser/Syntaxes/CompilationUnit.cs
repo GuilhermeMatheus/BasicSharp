@@ -25,7 +25,7 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             {
                 if (_module != value)
                 {
-                    value = _module;
+                    _module = value;
                     Accept(value);
                 }
             }

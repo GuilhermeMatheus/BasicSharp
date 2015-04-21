@@ -21,6 +21,7 @@ namespace BasicSharp.Compiler.Analyzer
         List<Type> allowedTypes = new List<Type>();
         List<Variable> fields = new List<Variable>();
         List<Assembly> assemblies = new List<Assembly>();
+        List<Type> sessionTypes = new List<Type>();
 
         Dictionary<string, List<Assembly>> assemblyCache = new Dictionary<string, List<Assembly>>();
 
@@ -161,6 +162,21 @@ namespace BasicSharp.Compiler.Analyzer
         }
         #endregion
 
+        public void AddSessionType(Type type)
+        {
+            this.sessionTypes.Add(type);
+        }
+
+        public List<MethodInfo> GetExternalMethodsFromSession(MethodInvocationExpression call, IEnumerable<Type> parameters)
+        {
+            var methods = from item in sessionTypes.SelectMany(m => m.GetMethods(BindingFlags.Static | BindingFlags.Public))
+                          where item.Name.Equals(call.MethodName.StringValue) &&
+                                item.GetParameters().Select(p => p.ParameterType).ToArray().Equals(parameters.ToArray())
+                          select item;
+
+            return methods.ToList();
+        }
+
         public MethodDeclaration GetInternalMethodDefinition(MethodInvocationExpression call)
         {
             var methods = from item in MethodStubs
@@ -171,6 +187,11 @@ namespace BasicSharp.Compiler.Analyzer
                 return null;
 
             return methods.First().InternalDefinition;
+        }
+
+        public Variable GetField(string name)
+        {
+            return fields.Where(f => f.Name == name).FirstOrDefault();
         }
 
         void loadField()

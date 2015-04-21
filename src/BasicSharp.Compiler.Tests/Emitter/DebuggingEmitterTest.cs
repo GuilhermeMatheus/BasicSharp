@@ -21,9 +21,6 @@ namespace BasicSharp.Compiler.Tests.Emitter
 		[TestMethod]
 		public void EmitterTests()
 		{
-			CultureInfo.DefaultThreadCurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
-
-
 			var source = @"
 implements System.Console;
 
@@ -38,6 +35,14 @@ module helloProgram
 
 	my void Main()
 	{
+		if (d > 10)
+		{
+			WriteLine(""maior que 10"");
+		}
+		else
+		{
+			WriteLine(""menor que 10"");
+		}
 	}
 }";
 
@@ -48,7 +53,6 @@ module helloProgram
 				AssembliesAddress = new List<string> { mscorlib },
 				Source = source
 			};
-
 
 			var syntax = ParserFactory.FromString(source).GetSyntax() as CompilationUnit;
 			var bag = new CompilationBag(project, syntax);

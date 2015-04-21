@@ -17,15 +17,15 @@ namespace BasicSharp.Compiler.ILEmitter
         {
             var result = new List<TacUnit>();
 
-            var conditionEmitter = new ExpressionEmitter(compilationBag, localIndexer);
-            var condition = conditionEmitter.Generate(node.Condition, labelPrefix, index);
+            var conditionEmitter = ExpressionEmitterFactory.GetEmitterFor(node.Condition, compilationBag, localIndexer);
+            var condition = conditionEmitter.GenerateWithType(node.Condition, labelPrefix, index);
 
-            result.AddRange(condition);
+            result.AddRange(condition.Item2);
 
             var brFalse = new TacUnit
             {
                 LabelPrefix = labelPrefix,
-                LabelIndex = condition.Last().LabelIndex + 1,
+                LabelIndex = condition.Item2.Last().LabelIndex + 1,
                 Op = OpCodes.Brfalse
             };
 
@@ -37,7 +37,7 @@ namespace BasicSharp.Compiler.ILEmitter
                 LabelPrefix = labelPrefix,
                 LabelIndex = block.Last().LabelIndex + 1,
                 Op = OpCodes.Br,
-                Value = GetLabel(condition.First().LabelPrefix, condition.First().LabelIndex)
+                Value = GetLabel(condition.Item2.First().LabelPrefix, condition.Item2.First().LabelIndex)
             };
 
             brFalse.Value = GetLabel(brCondition.LabelPrefix, brCondition.LabelIndex + 1);

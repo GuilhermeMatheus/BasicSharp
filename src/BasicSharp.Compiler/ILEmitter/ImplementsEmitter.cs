@@ -29,7 +29,10 @@ namespace BasicSharp.Compiler.ILEmitter
             if (alreadyAppendedAssemblies.Contains(fileName))
                 return;
             else
+            {
                 alreadyAppendedAssemblies.Add(fileName);
+                compilationBag.AddSessionType(assembly.GetType(type));
+            }
 
             var externDirective = EXTERN_FORMAT.Replace(FILE_NAME, fileName);
 

@@ -8,21 +8,22 @@ using System.Threading.Tasks;
 
 namespace BasicSharp.Compiler.ILEmitter
 {
-    public class ExpressionEmitter : TacEmitter<Expression>
+    public abstract class ExpressionEmitter<T> : TacEmitter<T>, IExpressionEmitter
+        where T : Expression
     {
         public ExpressionEmitter(CompilationBag compilationBag, ILocalIndexer localIndexer)
             : base(compilationBag, localIndexer) { }
 
-        public override List<TacUnit> Generate(Expression node, string labelPrefix = "IL_", int index = 0)
+        public Tuple<Type, List<TacUnit>> GenerateWithType(Expression node, string labelPrefix = "IL_", int index = 0)
         {
-            var result = new List<TacUnit>();
-
-            if (node is MethodInvocationExpression)
-            {
-                var methodInvocation = new MethodInvocationEmitter(compilationBag, localIndexer);
-            }
-
-            return result;
+            return GenerateWithType(node as T, labelPrefix, index);
         }
+        public abstract Tuple<Type, List<TacUnit>> GenerateWithType(T node, string labelPrefix = "IL_", int index = 0);
+
+        public override List<TacUnit> Generate(T node, string labelPrefix = "IL_", int index = 0)
+        {
+            return GenerateWithType(node, labelPrefix, index).Item2;
+        }
+
     }
 }
