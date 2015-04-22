@@ -42,6 +42,9 @@ namespace BasicSharp.Compiler.ILEmitter
             if(node.GetType() == typeof(LocalVariableDeclarationStatement))
                 return new LocalVariableDeclarationStatementEmitter(compilationBag, localIndexer);
 
+            if (node.GetType() == typeof(LocalVariableAssignmentStatement))
+                return new LocalVariableAssignmentStatementEmitter(compilationBag, localIndexer);
+
             throw new NotImplementedException();
         }
 

@@ -55,6 +55,21 @@ namespace BasicSharp.Compiler.Parser.Extensions
             return false;
         }
 
+        public static bool IsAssignmentOperator(this SyntaxKind syntaxKind)
+        {
+            switch (syntaxKind)
+            {
+                case SyntaxKind.EqualsToken:
+                case SyntaxKind.PlusEqualsToken:
+                case SyntaxKind.MinusEqualsToken:
+                case SyntaxKind.AsteriskEqualsToken:
+                case SyntaxKind.SlashEqualsToken:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         public static bool IsComparatorOperator(this SyntaxKind syntaxKind)
         {
             switch (syntaxKind)

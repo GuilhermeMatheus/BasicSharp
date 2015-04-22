@@ -40,6 +40,18 @@ namespace BasicSharp.Compiler.Parser.Syntaxes
             trivias.Add(trivia);
         }
 
+        public IEnumerable FindAll()
+        {
+            foreach (var item in GetChilds())
+            {
+                yield return item;
+
+                if (item is SyntaxNode)
+                    foreach (var subItem in (item as SyntaxNode).FindAll())
+                        yield return subItem;
+            }
+        }
+
         public abstract IEnumerable GetChilds();
         public abstract IEnumerable<TokenInfo> GetInternalTokens();
 

@@ -65,6 +65,7 @@
     <Compile Include="ILEmitter\Emitters\BinaryExpressionEmitter.cs" />
     <Compile Include="ILEmitter\Emitters\LocalVariableDeclarationStatementEmitter.cs" />
     <Compile Include="ILEmitter\Emitters\MethodInvocationStatementEmitter.cs" />
+    <Compile Include="ILEmitter\Emitters\LocalVariableAssignmentStatementEmitter.cs" />
     <Compile Include="ILEmitter\Factories\TacEmitterFactory.cs" />
     <Compile Include="ILEmitter\Emitters\FieldEmitter.cs" />
     <Compile Include="ILEmitter\Emitters\ForEmitter.cs" />

@@ -21,7 +21,9 @@ namespace BasicSharp.Compiler.ILEmitter
             {
                 var itemEmitter = TacEmitterFactory.GenerateWithNode(item, compilationBag, localIndexer, labelPrefix, index);
                 result.AddRange(itemEmitter.Item2);
-                index = result.GetNextLabel().Item2;
+                
+                if (result.Any())
+                    index = result.GetNextLabel().Item2;
             }
 
             return new Tuple<Type, List<TacUnit>>(null, result);

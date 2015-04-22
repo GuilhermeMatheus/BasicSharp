@@ -26,7 +26,7 @@ implements System.Console;
 
 module helloProgram
 { 
-	my int i = 1564654;
+	my int i = 100;
 	my double d = 1.123;
 	my byte b = 255;
 	my bool bo = false;
@@ -35,19 +35,16 @@ module helloProgram
 
 	my void Main()
 	{
-		string nome = ReadLine(""Digite seu nome"");
+		WriteLine(""Digite seu nome: "");
+		string nome = ReadLine();
 		Write(""Olá "");
 		Write(nome);
 		Write(""!"");
 
-		//if (d > 10.087987)
-		//{
-		//	WriteLine(""maior que 10"");
-		//}
-		//else
-		//{
-		//	WriteLine(""menor que 10"");
-		//}
+		while(i > 0) {
+			WriteLine(i);
+			i-=1;
+		}
 	}
 }";
 

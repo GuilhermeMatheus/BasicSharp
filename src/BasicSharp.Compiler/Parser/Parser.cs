@@ -46,17 +46,6 @@ namespace BasicSharp.Compiler.Parser
                 handleError(SyntacticExceptions.NotExpectedToken(currentToken(), result));
 
             return result;
-            
-            //For DEBUG only:
-
-            //SyntaxNode root;
-            //if ((root = getCompilationUnit()) != null)
-            //    return root;
-            //if ((root = getFieldOrMethodDeclaration()) != null)
-            //    return root;
-            //if ((root = getExpression()) != null)
-            //    return root;
-            //return null;
         }
 
         #region CompilerUnit
@@ -727,7 +716,6 @@ namespace BasicSharp.Compiler.Parser
             return result;
         }
 
-        //UNDONE: Precedence is not respected
         Expression getArithmeticBinaryExpression()
         {
             Expression root = getAdditiveExpression(null), aux = null;
@@ -809,7 +797,7 @@ namespace BasicSharp.Compiler.Parser
                 result.BracketedArgument = bracketed;
                 dumpTrivia(bracketed);
             }
-            else if (curr.Kind == SyntaxKind.EqualsToken)
+            else if (curr.Kind.IsAssignmentOperator())
             {
                 moveNextToken();
                 return new VariableAssignmentExpression { Identifier = identifier, Assignment = getAssignmentExpression(curr) };
@@ -834,7 +822,7 @@ namespace BasicSharp.Compiler.Parser
             if (current.Kind.IsIn(SyntaxKind.CommaToken, SyntaxKind.SemicolonToken))
                 return new VariableAssignmentExpression { Identifier = identifier };
 
-            if (current.Kind == SyntaxKind.EqualsToken)
+            if (current.Kind.IsAssignmentOperator())
             {
                 moveNextToken();
                 return new VariableAssignmentExpression { Identifier = identifier, Assignment = getAssignmentExpression(current) };

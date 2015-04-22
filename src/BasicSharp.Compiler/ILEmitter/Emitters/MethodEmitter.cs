@@ -49,9 +49,8 @@ namespace BasicSharp.Compiler.ILEmitter
 
             if (node.Identifier.StringValue.Equals("Main"))
                 builder.AppendLine("		.entrypoint");
-
-            var locals = node.Childs.OfType<VariableDeclaration>();
-            writeLocals(builder, locals);
+            
+            writeLocals(builder, node);
             builder.AppendLine();
 
             var blockTac = TacEmitterFactory.GenerateWithNode(node.Block, compilationBag, this, "IL_", 0);
@@ -68,8 +67,10 @@ namespace BasicSharp.Compiler.ILEmitter
             builder.AppendLine("}");
         }
 
-        void writeLocals(StringBuilder builder, IEnumerable<VariableDeclaration> locals)
+        void writeLocals(StringBuilder builder, MethodDeclaration node)
         {
+            var locals = node.FindAll().OfType<VariableDeclaration>();
+
             if (!locals.Any())
                 return;
 
@@ -82,7 +83,7 @@ namespace BasicSharp.Compiler.ILEmitter
                 var type = item.Type.GetCLRType();
                 foreach (var decl in item.Declarators)
                 {
-                    localsInit.Add(string.Format(LOCAL_SPECIFIER, i++, type.GetMsilTypeName()));
+                    localsInit.Add(string.Format(LOCAL_SPECIFIER, i, type.GetMsilTypeName()));
 
                     var var = new Variable
                     {
@@ -92,7 +93,7 @@ namespace BasicSharp.Compiler.ILEmitter
                         LocalInitIndex = i
                     };
 
-                    indexByLocalInit.Add(decl.Identifier.StringValue, new LocalInfo { Index = i, Variable = var });
+                    indexByLocalInit.Add(decl.Identifier.StringValue, new LocalInfo { Index = i++, Variable = var });
                 }
             }
 
@@ -102,8 +103,5 @@ namespace BasicSharp.Compiler.ILEmitter
 
             builder.AppendLine(")");
         }
-
-
-        
     }
 }
