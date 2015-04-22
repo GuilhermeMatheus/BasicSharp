@@ -32,11 +32,13 @@ namespace BasicSharp.Compiler.ILEmitter
             };
 
             var block = TacEmitterFactory.GenerateWithNode(node.Block, compilationBag, localIndexer, labelPrefix, index);
+            var nextLabel = block.Item2.GetNextLabel();
+            var idxBrCondition = nextLabel != null ? nextLabel.Item2 : index;
 
             var brCondition = new TacUnit
             {
                 LabelPrefix = labelPrefix,
-                LabelIndex = block.Item2.GetNextLabel().Item2,
+                LabelIndex = idxBrCondition,
                 Op = OpCodes.Br,
                 Value = GetLabel(condition.Item2.First().LabelPrefix, condition.Item2.First().LabelIndex)
             };

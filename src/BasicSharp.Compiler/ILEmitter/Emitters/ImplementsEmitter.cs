@@ -26,13 +26,13 @@ namespace BasicSharp.Compiler.ILEmitter
             var assembly = compilationBag.GetAssembliesForClass(type).First();
             var fileName = assembly.GetName().Name;
 
+            compilationBag.AddSessionType(assembly.GetType(type));
+
             if (alreadyAppendedAssemblies.Contains(fileName))
                 return;
             else
-            {
                 alreadyAppendedAssemblies.Add(fileName);
-                compilationBag.AddSessionType(assembly.GetType(type));
-            }
+
 
             var externDirective = EXTERN_FORMAT.Replace(FILE_NAME, fileName);
 

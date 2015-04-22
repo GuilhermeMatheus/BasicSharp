@@ -122,6 +122,7 @@ namespace BasicSharp.Compiler.Analyzer
                                                        }
                                       select new MethodStub(name, true, parameters)
                                       {
+                                          IsInternal = true,
                                           InternalDefinition = item,
                                           ReturnType = item.ReturnType.GetCLRType()
                                       };
@@ -170,7 +171,9 @@ namespace BasicSharp.Compiler.Analyzer
         public List<MethodInfo> GetExternalMethodsFromSession(MethodInvocationExpression call, IEnumerable<Type> parameters)
         {
             var methods = from item in sessionTypes
-                          select item.GetMethod(call.MethodName.StringValue, parameters.ToArray());
+                          let method = item.GetMethod(call.MethodName.StringValue, parameters.ToArray())
+                          where method != null
+                          select method;
             
             return methods.ToList();
         }

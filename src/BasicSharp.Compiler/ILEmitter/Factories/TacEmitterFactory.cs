@@ -14,6 +14,9 @@ namespace BasicSharp.Compiler.ILEmitter
             where T : SyntaxNode
         {
             //Expressions (return type)
+            if (node.GetType() == typeof(ParenthesedExpression))
+                return new ParenthesedExpressionEmitter(compilationBag, localIndexer);
+
             if (node.GetType() == typeof(MethodInvocationExpression))
                 return new MethodInvocationEmitter(compilationBag, localIndexer);
 
@@ -26,6 +29,12 @@ namespace BasicSharp.Compiler.ILEmitter
             if (node.GetType() == typeof(BinaryExpression) || node.GetType().IsSubclassOf(typeof(BinaryExpression)))
                 return new BinaryExpressionEmitter<T>(compilationBag, localIndexer);
 
+            if (node.GetType() == typeof(VariableAssignmentExpression))
+                return new VariableAssignmentExpressionEmitter(compilationBag, localIndexer);
+
+            if (node.GetType() == typeof(UnaryExpression))
+                return new UnaryExpressionEmitter(compilationBag, localIndexer);
+
             //Statements (no return type)
             if (node.GetType() == typeof(BlockStatement))
                 return new BlockEmitter(compilationBag, localIndexer);
@@ -36,6 +45,9 @@ namespace BasicSharp.Compiler.ILEmitter
             if (node.GetType() == typeof(WhileStatement))
                 return new WhileEmitter(compilationBag, localIndexer);
 
+            if (node.GetType() == typeof(ForStatement))
+                return new ForStatementEmitter(compilationBag, localIndexer);
+
             if (node.GetType() == typeof(MethodInvocationStatement))
                 return new MethodInvocationStatementEmitter(compilationBag, localIndexer);
 
@@ -44,6 +56,9 @@ namespace BasicSharp.Compiler.ILEmitter
 
             if (node.GetType() == typeof(LocalVariableAssignmentStatement))
                 return new LocalVariableAssignmentStatementEmitter(compilationBag, localIndexer);
+
+            if (node.GetType() == typeof(ReturnStatement))
+                return new ReturnStatementEmitter(compilationBag, localIndexer);
 
             throw new NotImplementedException();
         }

@@ -27,6 +27,11 @@ namespace BasicSharp.Compiler.ILEmitter
                 builder.AppendLine(item.ToString());
         }
 
+        protected string GetLabel(TacUnit tacUnit)
+        {
+            return GetLabel(tacUnit.LabelPrefix, tacUnit.LabelIndex);
+        }
+
         protected string GetLabel(string prefix, int index)
         {
             return prefix + index.ToString().PadLeft(4, '0');

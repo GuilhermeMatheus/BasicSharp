@@ -16,9 +16,10 @@ namespace BasicSharp.Compiler.ILEmitter
         const string ACCESSOR_MODIFIER = "<ACCESSOR_MODIFIER>";
         const string PARAMETERS = "<PARAMETERS>";
         const string NAME = "<NAME>";
+        const string RET_TYPE = "<RET_TYPE>";
         const string METHOD_HEADER = @"
 .method <ACCESSOR_MODIFIER> hidebysig static 
-        void <NAME> (<PARAMETERS>
+        <RET_TYPE> <NAME> (<PARAMETERS>
                       ) cil managed 
     {";
 
@@ -41,9 +42,12 @@ namespace BasicSharp.Compiler.ILEmitter
         public override void BuildString(StringBuilder builder, MethodDeclaration node)
         {
             var _params = node.ParameterList.Parameters.Select(p => string.Format("{0} {1}", p.Type.GetCLRType().GetMsilTypeName(), p.Identifier.StringValue));
+            var retType = node.ReturnType.GetCLRType().GetMsilTypeName();
+
             var methodHeader = METHOD_HEADER.Replace(NAME, node.Identifier.StringValue)
                                             .Replace(ACCESSOR_MODIFIER, node.IsPublic ? "public" : "private")
-                                            .Replace(PARAMETERS, string.Join(",\n                     ", _params));
+                                            .Replace(PARAMETERS, string.Join(",\n                     ", _params))
+                                            .Replace(RET_TYPE, retType);
 
             builder.AppendLine(methodHeader);
 
@@ -54,12 +58,18 @@ namespace BasicSharp.Compiler.ILEmitter
             builder.AppendLine();
 
             var blockTac = TacEmitterFactory.GenerateWithNode(node.Block, compilationBag, this, "IL_", 0);
-            blockTac.Item2.Add(new TacUnit
-                {
-                    LabelPrefix = blockTac.Item2.GetNextLabel().Item1,
-                    LabelIndex = blockTac.Item2.GetNextLabel().Item2,
-                    Op = OpCodes.Ret
-                });
+            var label = blockTac.Item2.GetNextLabel() ?? new Tuple<string, int>("IL_", 0);
+            var lastTac = blockTac.Item2.LastOrDefault();
+
+            var blockReturns = lastTac != null && lastTac.Op == OpCodes.Ret;
+
+            if (!blockReturns)
+                blockTac.Item2.Add(new TacUnit
+                    {
+                        LabelPrefix = label.Item1,
+                        LabelIndex = label.Item2,
+                        Op = OpCodes.Ret
+                    });
 
             foreach (var item in blockTac.Item2)
                 builder.AppendLine(item.ToString());

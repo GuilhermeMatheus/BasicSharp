@@ -125,10 +125,34 @@
                 <TabControl Grid.Column="1"
                             Margin="4,5,5,5">
                     <TabItem Header="Source" Background="Yellow">
-                        <avalon:TextEditor x:Name="textEditor"
-                                           helpers:TextEditorBindingHelper.Attach="true"
-                                           helpers:TextEditorBindingHelper.Text="{Binding CurrentSource.Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=1000}"
-                                           ShowLineNumbers="True"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <!--Source-->
+                            <avalon:TextEditor x:Name="textEditor"
+                                               helpers:TextEditorBindingHelper.Attach="true"
+                                               helpers:TextEditorBindingHelper.Text="{Binding CurrentSource.Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=1000}"
+                                               ShowLineNumbers="True"/>
+                            
+                            <!--IL-->
+                            <Expander Grid.Column="1"
+                                      ExpandDirection="Left"
+                                      Header="MSIL">
+                                <TextBox IsReadOnly="True" Background="Black" Foreground="White" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                         Margin="5,0" VerticalAlignment="Stretch" TextWrapping="Wrap" MinWidth="350" HorizontalAlignment="Stretch"
+                                         FontFamily="Consolas"
+                                         Text="{Binding CurrentSource.MSIL, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Expander>
+
+                            <!--GridSplitter-->
+                            <GridSplitter Grid.Column="1"
+                                          Width="2" 
+                                          HorizontalAlignment="Left"
+                                          VerticalAlignment="Stretch"/>
+                                          
+                        </Grid>
                     </TabItem>
                 </TabControl>
             </Grid>

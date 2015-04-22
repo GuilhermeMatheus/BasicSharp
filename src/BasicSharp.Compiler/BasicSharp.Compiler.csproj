@@ -66,9 +66,13 @@
     <Compile Include="ILEmitter\Emitters\LocalVariableDeclarationStatementEmitter.cs" />
     <Compile Include="ILEmitter\Emitters\MethodInvocationStatementEmitter.cs" />
     <Compile Include="ILEmitter\Emitters\LocalVariableAssignmentStatementEmitter.cs" />
+    <Compile Include="ILEmitter\Emitters\ForStatementEmitter.cs" />
+    <Compile Include="ILEmitter\Emitters\ParenthesedExpressionEmitter.cs" />
+    <Compile Include="ILEmitter\Emitters\ReturnStatementEmitter.cs" />
     <Compile Include="ILEmitter\Factories\TacEmitterFactory.cs" />
     <Compile Include="ILEmitter\Emitters\FieldEmitter.cs" />
-    <Compile Include="ILEmitter\Emitters\ForEmitter.cs" />
+    <Compile Include="ILEmitter\Emitters\UnaryExpressionEmitter.cs" />
+    <Compile Include="ILEmitter\Emitters\VariableAssignmentExpressionEmitter.cs" />
     <Compile Include="ILEmitter\IEmitter.cs" />
     <Compile Include="ILEmitter\IExpressionEmitter.cs" />
     <Compile Include="ILEmitter\Emitters\IfEmitter.cs" />

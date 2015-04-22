@@ -35,8 +35,11 @@ namespace BasicSharp.Compiler.ILEmitter
             var blockEmitter = new BlockEmitter(compilationBag, localIndexer);
             var then = blockEmitter.Generate(node.Then, labelPrefix, index);
 
-            var thenLastTac = then.Last();
-            brF.Value = GetLabel(labelPrefix, thenLastTac.LabelIndex + 2);
+            var thenLastTac = then != null ? then.LastOrDefault() : null;
+            if (thenLastTac != null)
+                brF.Value = GetLabel(labelPrefix, thenLastTac.LabelIndex + 2);
+            else
+                brF.Value = GetLabel(labelPrefix, index + 1);
 
             result.Add(brF);
             result.AddRange(then);

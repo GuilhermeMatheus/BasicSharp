@@ -116,6 +116,7 @@ namespace BasicSharp.Compiler.Lexer
                     case ' ':
                         yield return updateCurrentLineColumn(scanTrivia());
                         continue;
+                    case '!':
                     case '=':
                     case '<':
                     case '>':

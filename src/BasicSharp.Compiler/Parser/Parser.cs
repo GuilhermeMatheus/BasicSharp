@@ -626,17 +626,7 @@ namespace BasicSharp.Compiler.Parser
         #region Expressions
         Expression getExpression()
         {
-            Expression root;
-
             return getBinaryExpression();
-
-            //if((root = getBooleanExpression()) != null)
-            //    return root;
-
-            if ((root = getArithmeticBinaryExpression()) != null)
-                return root;
-
-            return null;
         }
 
         Expression getBinaryExpression()
@@ -874,6 +864,15 @@ namespace BasicSharp.Compiler.Parser
                         moveNextToken();
                     }
                 }
+                else
+                {
+                    if (currentToken().Kind != SyntaxKind.CloseParenToken)
+                    {
+                        handleError(SyntacticExceptions.ExpectedTokenNotFound(SyntaxKind.CloseParenToken, arguments));
+                        break;
+                    }
+                }
+
             }
 
             arguments.CloseParenToken = currentToken();
@@ -1004,7 +1003,10 @@ namespace BasicSharp.Compiler.Parser
         void dumpTrivia(SyntaxNode node)
         {
             while (triviaBuffer.Count > 0)
-                node.AddTrivia(triviaBuffer.Dequeue());
+                if (node != null)
+                    node.AddTrivia(triviaBuffer.Dequeue());
+                else
+                    triviaBuffer.Dequeue();
         }
         TokenInfo currentToken()
         {

@@ -1,5 +1,6 @@
 ﻿using BasicSharp.Compiler;
 using BasicSharp.Compiler.Analyzer;
+using BasicSharp.Compiler.ILEmitter;
 using BasicSharp.Compiler.Lexer;
 using BasicSharp.Compiler.Parser;
 using BasicSharp.Compiler.Parser.Syntaxes;
@@ -23,6 +24,17 @@ namespace BasicSharp.IDE.ViewModel
     {
         FileProject project = null;
 
+        private string msil;
+        public string MSIL
+        {
+            get { return msil; }
+            set
+            {
+                msil = value;
+                OnPropertyChanged();
+            }
+        }
+
         private string source;
         public string Source
         {
@@ -35,7 +47,7 @@ namespace BasicSharp.IDE.ViewModel
                 source = value;
                 OnPropertyChanged();
 
-                updateTokenAndSyntax();
+                updateAll();
             }
         }
 
@@ -89,7 +101,7 @@ namespace BasicSharp.IDE.ViewModel
             this.project = project;
         }
 
-        void updateTokenAndSyntax()
+        void updateAll()
         {
             Errors.Clear();
 
@@ -111,16 +123,31 @@ namespace BasicSharp.IDE.ViewModel
             if (parsedSyntax as CompilationUnit == null)
                 return;
 
+            CompilationBag bag = null;
+            var compilationUnit = parsedSyntax as CompilationUnit;
+            
             try
             {
-                var bag = new CompilationBag(project, parsedSyntax as CompilationUnit);
+                bag = new CompilationBag(project, compilationUnit);
                 var analyzer = bag.Analyzer;
                 foreach (var item in analyzer.GetAnalysisForCompilationUnit())
                     Errors.Add(item.MessageResult);
             }
             catch { }
 
-            this.Status = Errors.Count == 0 ? Status.CompilationSuccess : Status.CompilationException;
+            if (Errors.Count == 0)
+            {
+                this.Status = Status.CompilationSuccess;
+                if (bag != null)
+                    this.MSIL = new CodeGenerator(bag, compilationUnit).Translate();
+                else
+                    this.MSIL = string.Empty;
+            }
+            else
+            {
+                this.Status = Status.CompilationException;
+                this.MSIL = string.Empty;
+            }
         }
     }
 }
