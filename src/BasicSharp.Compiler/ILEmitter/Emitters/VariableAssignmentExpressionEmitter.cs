@@ -43,8 +43,16 @@ namespace BasicSharp.Compiler.ILEmitter
             }
             else
             {
-                opAssignment = OpCodes.Stloc;
-                valueAssignment = localTarget.Index.ToString();
+                if (localTarget.IsArgument)
+                {
+                    opAssignment = OpCodes.Starg;
+                    valueAssignment = targetName;
+                }
+                else 
+                {
+                    opAssignment = OpCodes.Stloc;
+                    valueAssignment = localTarget.Index.ToString();
+                }
             }
 
             var operatorActions = getTacForAssignmentOperator(assign.OperatorToken.Kind, label.Item1, label.Item2, localTarget, valueAssignment);

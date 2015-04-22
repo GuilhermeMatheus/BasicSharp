@@ -36,8 +36,16 @@ namespace BasicSharp.Compiler.ILEmitter
             if (localInfo != null)
             {
                 typeResult = localInfo.Variable.ClrType;
-                tac.Op = OpCodes.Ldloc;
-                tac.Value = localInfo.Index.ToString();
+                if (localInfo.IsArgument)
+                {
+                    tac.Op = OpCodes.Ldarg;
+                    tac.Value = name;
+                }
+                else
+                {
+                    tac.Op = OpCodes.Ldloc;
+                    tac.Value = localInfo.Index.ToString();
+                }
             }
             else
             {

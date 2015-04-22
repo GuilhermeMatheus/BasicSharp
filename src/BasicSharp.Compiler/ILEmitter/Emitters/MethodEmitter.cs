@@ -41,7 +41,30 @@ namespace BasicSharp.Compiler.ILEmitter
 
         public override void BuildString(StringBuilder builder, MethodDeclaration node)
         {
-            var _params = node.ParameterList.Parameters.Select(p => string.Format("{0} {1}", p.Type.GetCLRType().GetMsilTypeName(), p.Identifier.StringValue));
+            indexByLocalInit.Clear();
+
+            var _params = new List<string>();
+            
+            foreach (var item in node.ParameterList.Parameters)
+            {
+                var clrType = item.Type.GetCLRType();
+                var type = clrType.GetMsilTypeName();
+                var name = item.Identifier.StringValue;
+
+                indexByLocalInit.Add(name, new LocalInfo
+                {
+                    IsArgument = true,
+                    Variable = new Variable
+                    {
+                        Definition = item,
+                        Name = name,
+                        ClrType = clrType
+                    }
+                });
+
+                _params.Add(string.Format("{0} {1}", type, name));
+            }
+
             var retType = node.ReturnType.GetCLRType().GetMsilTypeName();
 
             var methodHeader = METHOD_HEADER.Replace(NAME, node.Identifier.StringValue)

@@ -6,6 +6,7 @@ namespace BasicSharp.Compiler.ILEmitter
     {
         public int Index { get; internal set; }
         public Variable Variable { get; internal set; }
+        public bool IsArgument { get; internal set; }
     }
 
     public interface ILocalIndexer
