@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,13 +11,13 @@ namespace BasicSharp.Compiler
     public abstract class Project
     {
         public string Name { get; set; }
-        public List<string> AssembliesAddress { get; set; }
+        public ObservableCollection<string> AssembliesAddress { get; set; }
         
         public abstract Stream GetSourceStream();
 
         public Project()
         {
-            this.AssembliesAddress = new List<string>();
+            this.AssembliesAddress = new ObservableCollection<string>();
         }
     }
 }

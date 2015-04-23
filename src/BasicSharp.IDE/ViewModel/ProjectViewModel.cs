@@ -12,7 +12,7 @@ namespace BasicSharp.IDE.ViewModel
     {
         public FileProject Project { get; set; }
 
-        public List<string> AssembliesAddress
+        public ObservableCollection<string> AssembliesAddress
         {
             get
             {
