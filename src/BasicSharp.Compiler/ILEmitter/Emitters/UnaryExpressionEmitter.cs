@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using BasicSharp.Compiler.ILEmitter.Extensions;
 using System.Reflection.Emit;
+using BasicSharp.Compiler.Lexer;
 
 namespace BasicSharp.Compiler.ILEmitter
 {
@@ -26,7 +27,8 @@ namespace BasicSharp.Compiler.ILEmitter
                 Op = OpCodes.Neg
             };
 
-            result.Item2.Add(neg);
+            if (node.SignalToken.Kind == SyntaxKind.MinusToken)
+                result.Item2.Add(neg);
 
             return result;
         }
