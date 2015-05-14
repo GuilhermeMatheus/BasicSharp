@@ -30,9 +30,8 @@ implements System.Math;      // Sqrt(string);  [...]
 
 The absolute path of this .DLL files are stored in the project file, in XML format.
 
- <br/>
  
- # Simple Calculator
+# Simple Calculator
 
 <pre> 
 implements System.Console;
