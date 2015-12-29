@@ -1,6 +1,5 @@
 # Welcome to BasicSharp Compiler!
 
-
 BasicSharp is an simple programming language very similar to C# and Java.
 
 <br/>
@@ -30,119 +29,18 @@ implements System.Math;      // Sqrt(string);  [...]
 
 The absolute path of this .DLL files are stored in the project file, in XML format.
 
+# IDE Features
+
+These screen shots show B# IDE running.
  
-# Simple Calculator
+### Tokens list
+When you select an item on token list, it's highlighted on text editor!
+![IDE Tokens](https://github.com/GuilhermeMatheus/BasicSharp/raw/master/img/ss-tokens.png)
 
-<pre> 
-implements System.Console;
-implements System.Convert;
-implements System.Math;
+### Syntax Tree visualizer
+When you select an node on Syntax Tree visualizer, it's highlighted on text editor too!
+![IDE SyntaxTree](https://github.com/GuilhermeMatheus/BasicSharp/raw/master/img/ss-syntaxtree.png)
 
-module Calculator {
-	
-	my void Main()
-	{
-		while(true)
-		{
-			WriteLine("BSharp Calculator!");
-			WriteLine("Press any key to continue...");
-			ReadLine();
-			Clear();
-			WriteLine("Digite uma opcao:");
-			WriteLine("    1. Pow");
-			WriteLine("    2. Mult");
-			WriteLine("    3. Sqrt");
-			WriteLine("    4. Factoring");
-			WriteLine("    5. Exit");
-			
-			string _option = ReadLine();
-			int option = ToInt32(_option);
-			bool isValidOption = option > 0 & option <= 4;
-			
-			if (isValidOption)
-			{
-				if(option == 1)
-				{
-					Pow();
-				}
-				if(option == 2)
-				{
-					Mult();
-				}
-				if(option == 3)
-				{
-					Sqrt();
-				}
-				if(option == 4)
-				{
-					double n = getDouble();
-					Factoring(ToInt32(n));
-					return;
-				}
-				if(option == 5)
-				{
-					return;
-				}
-			}
-		}
-	}
-	
-	everybody void Pow()
-	{
-		double n = getDouble();
-		double p = getDouble();
-		
-		Write("Pow of ");	
-		Write(n);
-		Write(" at ");
-		Write(p);
-		Write(" is ");
-		Write(Pow(n, p));
-		WriteLine();
-	}
-	
-	everybody void Mult()
-	{
-		double n = getDouble();
-		double p = getDouble();
-		
-		Write(n);
-		Write(" * ");
-		Write(p);
-		Write(" equals to ");
-		Write(n * p);
-		WriteLine();
-	}
-	
-	everybody void Sqrt()
-	{
-		double n = getDouble();
-		
-		Write("Sqrt of ");	
-		Write(n);
-		Write(" is ");
-		Write(Sqrt(n));
-	}
-	
-	everybody void Factoring(int n)
-	{
-		int i;
-		int result = 1;
-		for(i = 0; i < n; i += 1)
-		{
-			result *= (n - i);
-		}		
-		
-		Write("Factoring ");	
-		Write(n);
-		Write(" is ");
-		Write(result);
-	}
-	
-	my double getDouble()
-	{
-		WriteLine("Enter a number: ");	
-		return ToDouble(ReadLine());
-	}
-}
-</pre>
+### MSIL on-edit view
+You can see your MSIL generated while typing!
+![IDE MSIL](https://github.com/GuilhermeMatheus/BasicSharp/raw/master/img/ss-msil.png)
